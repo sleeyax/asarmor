@@ -1,7 +1,7 @@
 {
   "name": "asarmor",
   "version": "1.0.0",
-  "description": "Protect asar file from being unpacked",
+  "description": "Protect asar archive file from extraction",
   "main": "src/asarmor.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

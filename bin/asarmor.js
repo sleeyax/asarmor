@@ -4,7 +4,7 @@ const Asarmor = require('../src/asarmor');
 program
     .option('-a, --archive <archive>', 'input asar file (required)')
     .option('-o, --output <output>', 'output asar file (required)')
-    .option('--filecrash <filename>', 'crash extraction by corrupting specified file within the archive')
+    .option('--filecrash <filename>', 'stop extraction by corrupting specified file within the archive')
     .parse(process.argv);
 
 if (program.archive === undefined || program.output === undefined) {
