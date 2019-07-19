@@ -1,6 +1,6 @@
 {
   "name": "asarmor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Protect asar archive file from extraction",
   "main": "src/asarmor.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "chromium-pickle-js": "^0.2.0",
     "commander": "^2.20.0"
   },
-  "bin": "bin/asarmor.js",
+  "bin": "./bin/asarmor.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/sleeyax/asarmor"
