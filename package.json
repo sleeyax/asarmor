@@ -1,0 +1,17 @@
+{
+  "name": "asarmor",
+  "version": "1.0.0",
+  "description": "Protect asar files from being unpacked",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Sleeyax",
+  "license": "MIT",
+  "dependencies": {
+    "chromium-pickle-js": "^0.2.0",
+    "commander": "^2.20.0"
+  },
+  "bin": "bin/asarmor.js"
+}
