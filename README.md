@@ -20,8 +20,7 @@ Options:
 ```
 ### library
 ```
-const Asarmor = require('asarmor');
-const FileCrash = require('../src/protections/crashfile');
+const {Asarmor, FileCrash} = require('asarmor');
 
 const asarmor = new Asarmor('input.asar');
 asarmor.applyProtection(new FileCrash('target.js'));
