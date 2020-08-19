@@ -1,4 +1,4 @@
-import { IHeader } from './IHeader';
+import IHeader from './IHeader';
 
 export default interface IArchive {
 	headerSize: number;
