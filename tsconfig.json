@@ -13,6 +13,7 @@
 
     "resolveJsonModule": true,
     "skipLibCheck": true,    
-    "forceConsistentCasingInFileNames": true 
+    "forceConsistentCasingInFileNames": true ,
+	"exclude": ["./bin/asarmor.js", "./src/asarmor.js", "./src/index.js", "./src/protections/crashfile.js"]
   }
 }
