@@ -28,6 +28,8 @@ class CrashFile {
 				header: this.header,
 				contents: archive.contents
 			}
+
+			return newArchive;
 		}
 
 		throw new Error(`${this.target} not found in archive!`)
