@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "declaration": true
   },
   "include": [
     "./bin/*.ts",

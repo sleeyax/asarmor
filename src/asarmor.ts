@@ -14,7 +14,7 @@ export default class Asarmor {
 		this.archive = this.readArchive(this.filePath);
 	}
 
-	private readArchiveContents(header: IHeader, headerSize: number): any {
+	private readArchiveContents(header: IHeader, headerSize: number) {
 		for (let key in header) {
 			const file = header[key];
 			let contentArr = [];
@@ -90,7 +90,7 @@ export default class Asarmor {
 		out.write(sizeBuffer);
 		out.write(headerBuffer);
 
-		this.archive.contents.forEach( (buffer: Buffer) => {
+		this.archive.contents?.forEach( (buffer: Buffer) => {
 			out.write(buffer);
 		});
 

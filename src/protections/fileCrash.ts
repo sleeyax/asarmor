@@ -4,11 +4,11 @@ import IArchive from '../interfaces/IArchive';
 const pickle = require('chromium-pickle-js');
 
 export default class FileCrash {
-	private target: any;
+	private target: string;
 	private headerSize: number;
 	private header: IHeader;
 
-	constructor(target: any) {
+	constructor(target: string) {
 		this.target = target;
 		this.headerSize = 0;
 		this.header = { files: '' }
