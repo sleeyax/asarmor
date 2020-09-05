@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+
+    "target": "es5",
+	"module": "commonjs",
+	"lib": ["es6"],
+	"allowJs": true,
+    "outDir": "build",
+	"rootDir": ".",   
+    "strict": true,    
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+
+    "resolveJsonModule": true,
+    "skipLibCheck": true,    
+    "forceConsistentCasingInFileNames": true ,
+	"exclude": ["./bin/asarmor.js", "./src/asarmor.js", "./src/index.js", "./src/protections/crashfile.js"]
+  }
+}
