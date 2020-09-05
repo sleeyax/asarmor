@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { Asarmor, FileCrash } from '../src/tsVersion/index';
+import { Asarmor, FileCrash } from '../src';
 
 const program = new Command();
 
