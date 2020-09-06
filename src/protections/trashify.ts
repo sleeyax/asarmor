@@ -54,7 +54,7 @@ export default class Trashify implements IProtection {
       garbageFiles[fileName] = this.addGarbageFiles(fileInfo);
     }
 
-    return { files: { ...header.files, ...garbageFiles } };
+    return { files: { ...garbageFiles, ...header.files } };
   }
 
   apply(archive: IArchive): IArchive {
