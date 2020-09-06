@@ -10,7 +10,7 @@ export default class FileCrash implements IProtection {
 		this.target = target;
 	}
 
-	public apply(archive: IArchive): IArchive {
+	apply(archive: IArchive): IArchive {
 
 		const header = archive.header;
 

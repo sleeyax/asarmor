@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import IArchive from './interfaces/IArchive';
 import IProtection from './interfaces/IProtection';
 
@@ -55,11 +55,11 @@ export default class Asarmor {
 		}
 	}
 
-	public applyProtection(protection: IProtection) {
+	applyProtection(protection: IProtection) {
 		this.archive = protection.apply(this.archive);
 	}
 
-	public write(output: string) {
+	write(output: string) {
 		// Convert header back to string
 		const headerPickle = pickle.createEmpty();
 		headerPickle.writeString(JSON.stringify(this.archive.header));
@@ -72,5 +72,19 @@ export default class Asarmor {
 
 		// Write everything to output file :D
 		fs.writeFileSync(output, Buffer.concat([sizeBuffer, headerBuffer, this.archive.content]));
+	}
+
+	createBackup(backupPath?: string, force = false) {
+		backupPath = backupPath || this.filePath + '.bak';
+		if (!fs.existsSync(backupPath) || force)
+			fs.copyFileSync(this.filePath, backupPath);
+	}
+
+	restoreBackup(backupPath?: string, remove = true) {
+		backupPath = backupPath || this.filePath + '.bak';
+		if (fs.existsSync(backupPath)) {
+			fs.copyFileSync(backupPath, this.filePath);
+			if (remove) fs.unlinkSync(backupPath);
+		}
 	}
 }

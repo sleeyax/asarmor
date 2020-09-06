@@ -17,19 +17,24 @@ Options:
   -a, --archive <archive>        input asar file (required)
   -o, --output <output>          output asar file (required)
   -v, --verbose                  enable verbose console output
-  -f, --filetocrash <filename>   corrupt specified file within the archive 
-  -t, --trashify [junkfiles...]  add non-existing junk files to the archive
+  -b, --backup                   create backup
+  -r, --restore                  restore backup (protections won't be applied)
+  -f, --filetocrash <filename>   corrupt specified file within the archive    
+  -t, --trashify [junkfiles...]  add non-existing junk files to the archive   
   -h, --help                     display help for command
 
 Examples:
   $ asarmor -a app.asar -o asarmor.asar --filetocrash index_dummy.js
   $ asarmor -a app.asar -o asarmor.asar --trashify bee-movie.txt foo.js bar.ts
+  $ asarmor -a app.asar -o asarmor.asar --trashify --backup
+  $ asarmor -a app.asar -o asarmor.asar --trashify --restore
 ```
 ### library
 ```javascript
 const {Asarmor, FileCrash} = require('asarmor');
 
 const asarmor = new Asarmor('input.asar');
+asarmor.createBackup('~/Documents/backups/app.asar.backup');
 asarmor.applyProtection(new FileCrash('target.js'));
 asarmor.applyProtection(new Trashify(['foo', 'bar'], Randomizers.randomExtension));
 asarmor.write('output.asar');
