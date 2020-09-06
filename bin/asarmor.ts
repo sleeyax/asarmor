@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Command } from 'commander';
 import { Asarmor, FileCrash } from '../src';
 import Trashify from '../src/protections/trashify';
