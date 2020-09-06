@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import IArchive from './interfaces/IArchive';
-import IHeader from './interfaces/IHeader';
-import FileCrash from './protections/fileCrash';
+import IProtection from './interfaces/IProtection';
 
 const pickle = require('chromium-pickle-js');
 
@@ -14,24 +13,10 @@ export default class Asarmor {
 		this.archive = this.readArchive(this.filePath);
 	}
 
-	private readArchiveContents(header: IHeader, headerSize: number) {
-		for (let key in header) {
-			const file = header[key];
-			let contentArr = [];
-			// Call recursively for directories :D
-			if (file?.files) {
-				contentArr.push(this.readArchiveContents(file.files, headerSize));
-			} else {
-				const fd = fs.openSync(this.filePath, 'r');
-				const buffer = Buffer.alloc(file.size);
-				const offset = 8 + headerSize + parseInt(file.offset);
-				fs.readSync(fd, buffer, 0, file.size, offset);
-
-				contentArr.push(buffer);
-				return contentArr;
-
-			}
-		}
+	private readArchiveContents(headerSize: number) {
+		const fileBuf = fs.readFileSync(this.filePath);
+		const start = 8 + headerSize;
+		return fileBuf.slice(start);
 	}
 
 	private readArchive(archive: string): IArchive {
@@ -54,24 +39,24 @@ export default class Asarmor {
 			const headerPickle = pickle.createFromBuffer(headerBuffer);
 			const _header = JSON.parse(headerPickle.createIterator().readString());
 
-			// Read files stored in archive to a Buffer[] array
-			const _contents = this.readArchiveContents(_header.files, _headerSize);
+			// Read files stored in archive to Buffer
+			const _content = this.readArchiveContents(_headerSize);
 
 			// Returning archive object 
 			return {
 				headerSize: _headerSize,
 				header: _header,
-				contents: _contents
+				content: _content
 			}
 		} catch(e) {
-			throw new Error(e.message);
+			throw e;
 		} finally {
 			fs.closeSync(fd);
 		}
 	}
 
-	public applyProtection(protection: FileCrash) {
-		return protection.apply(this.archive)
+	public applyProtection(protection: IProtection) {
+		this.archive = protection.apply(this.archive);
 	}
 
 	public write(output: string) {
@@ -86,14 +71,6 @@ export default class Asarmor {
 		const sizeBuffer = sizePickle.toBuffer();
 
 		// Write everything to output file :D
-		const out = fs.createWriteStream(output);
-		out.write(sizeBuffer);
-		out.write(headerBuffer);
-
-		this.archive.contents?.forEach( (buffer: Buffer) => {
-			out.write(buffer);
-		});
-
-		out.end();
+		fs.writeFileSync(output, Buffer.concat([sizeBuffer, headerBuffer, this.archive.content]));
 	}
 }
