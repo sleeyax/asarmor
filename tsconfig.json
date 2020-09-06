@@ -16,6 +16,7 @@
   },
   "include": [
     "./bin/*.ts",
-    "src/**/*.ts"
+    "./src/**/*.ts",
+    "package.json"
   ]
 }
