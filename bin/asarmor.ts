@@ -21,19 +21,19 @@ program
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --filetocrash index_dummy.js');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --trashify bee-movie.txt foo.js bar.ts');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --trashify --backup');
-		console.log('  $ asarmor -a app.asar -o asarmor.asar --trashify --restore');
+		console.log('  $ asarmor -a app.asar --restore');
 	})
 	.parse(process.argv);
 
-if (program?.archive && program?.output) {
+if (program.archive) {
 	if (program.verbose) process.env.VERBOSE = 'true';
 
-	const asarmor = new Asarmor(program?.archive);
+	const asarmor = new Asarmor(program.archive);
 
 	if (program.restore) {
 		asarmor.restoreBackup();
 	}
-	else {
+	else if (program.output) {
 		if (program.backup)
 			asarmor.createBackup();
 
