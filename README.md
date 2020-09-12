@@ -31,11 +31,11 @@ Examples:
 ```
 ### library
 ```javascript
-const {Asarmor, FileCrash, Trashify} = require('asarmor');
+const {Asarmor, FileCrash, Trashify, Randomizers} = require('asarmor');
 
-const asarmor = new Asarmor('input.asar');
+const asarmor = new Asarmor('app.asar');
 asarmor.createBackup('~/Documents/backups/app.asar.backup');
 asarmor.applyProtection(new FileCrash('target.js'));
 asarmor.applyProtection(new Trashify(['foo', 'bar'], Randomizers.randomExtension));
-asarmor.write('output.asar');
+asarmor.write('app.asar');
 ```

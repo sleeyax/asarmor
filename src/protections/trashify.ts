@@ -70,7 +70,7 @@ export default class Trashify implements IProtection {
 
 }
 
-export class Randomizers {
-  static junkedJsExtension: Randomizer = (fileName) => `${fileName}.${Math.random().toString(36).substr(2, 6)}.js`;
-  static randomExtension: Randomizer = (fileName) => `${fileName}.${randomItem(['js', 'ts', 'jsx', 'tsx', 'txt', 'key', 'license', 'png', 'jpg', 'gif', 'md'])}`
+export const Randomizers = {
+  junkedJsExtension: (fileName: string) => `${fileName}.${Math.random().toString(36).substr(2, 6)}.js`,
+  randomExtension: (fileName: string) => `${fileName}.${randomItem(['js', 'ts', 'jsx', 'tsx', 'txt', 'key', 'license', 'png', 'jpg', 'gif', 'md'])}`
 }
