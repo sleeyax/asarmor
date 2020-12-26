@@ -68,9 +68,20 @@ export default class Trashify implements IProtection {
     };
   }
 
-}
-
-export const Randomizers = {
-  junkedJsExtension: (fileName: string) => `${fileName}.${Math.random().toString(36).substr(2, 6)}.js`,
-  randomExtension: (fileName: string) => `${fileName}.${randomItem(['js', 'ts', 'jsx', 'tsx', 'txt', 'key', 'license', 'png', 'jpg', 'gif', 'md'])}`
+  static readonly Randomizers = {
+    /**
+     * add some junk characters optionally followed by given extension
+     * 
+     * e.g. <filename>.hgd97e, <filename>.08z7ad.js, <filename>.hgd97e.key
+     */
+    junkExtension: (extension?: string) => (fileName: string) => `${fileName}.${Math.random().toString(36).substr(2, 6)}${extension ? ('.' + extension) : ''}`,
+    /**
+     * insert random extension
+     * 
+     * e.g. .js, .ts, .txt, .key
+     * 
+     * if no extensions are given a default list will be used
+     */
+    randomExtension: (extensions?: string[]) => (fileName: string) => `${fileName}.${randomItem(extensions || ['js', 'ts', 'jsx', 'tsx', 'txt', 'key', 'license', 'png', 'jpg', 'gif', 'md'])}`
+  }
 }
