@@ -40,3 +40,24 @@ asarmor.applyProtection(new Trashify(['foo', 'bar'], Trashify.Randomizers.random
 asarmor.applyProtection(new Trashify(['baz'], Trashify.Randomizers.junkExtension()));
 asarmor.write('app.asar');
 ```
+### electron-builder
+You can easily include asarmor in your packaging process using an [afterPack](https://www.electron.build/configuration/configuration.html#afterpack) hook:
+```
+const { Asarmor, Trashify } = require('asarmor');
+const { join } = require("path");
+
+exports.default = async ({ appOutDir, packager }) => {
+  try {
+    const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');
+    console.log(`applying asarmor protections to ${asarPath}`);
+    const asarmor = new Asarmor(asarPath);
+    asarmor.applyProtection(new Trashify(['.git', '.env']));
+    asarmor.write(asarPath);
+  } catch (err) {
+    console.error(err);
+  }
+};
+```
+
+## support
+If you're experiencing a bug or have a public question, open an issue on this repository. Addional, dedicated support in private will only be provided for a fee because my time is valuable.
