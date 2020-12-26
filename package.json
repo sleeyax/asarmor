@@ -1,6 +1,6 @@
 {
   "name": "asarmor",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "description": "Protect asar archive file from extraction",
   "main": "build/src/index.js",
   "scripts": {
