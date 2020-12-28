@@ -60,4 +60,4 @@ exports.default = async ({ appOutDir, packager }) => {
 ```
 
 ## support
-If you're experiencing a bug or have a public question, open an issue on this repository. Addional, dedicated support in private will only be provided for a fee because my time is valuable.
+If you're experiencing a bug or have a public question, open an issue on this repository. Addional, dedicated support in private will only be provided as a paid service because my time is valuable.
