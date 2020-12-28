@@ -42,7 +42,7 @@ asarmor.write('app.asar');
 ```
 ### electron-builder
 You can easily include asarmor in your packaging process using an [afterPack](https://www.electron.build/configuration/configuration.html#afterpack) hook:
-```
+```javascript
 const { Asarmor, Trashify } = require('asarmor');
 const { join } = require("path");
 
