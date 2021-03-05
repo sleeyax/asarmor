@@ -13,38 +13,39 @@ program
 	.option('-v, --verbose', 'enable verbose console output')
 	.option('-b, --backup', 'create backup')
 	.option('-r, --restore', 'restore backup (protections won\'t be applied)')
-	.option('-f, --filetocrash <filename>', 'corrupt specified file within the archive')
+	.option('-f, --filetocrash <filename size...>', 'corrupt specified file within the archive')
 	.option('-t, --trashify [junkfiles...]', 'add non-existing junk files to the archive')
 	.on('--help', () => {
 		console.log('');
 		console.log('Examples:');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --filetocrash index_dummy.js');
+		console.log('  $ asarmor -a app.asar -o asarmor.asar --filetocrash index_dummy.js -999');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --trashify bee-movie.txt foo.js bar.ts');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --trashify --backup');
 		console.log('  $ asarmor -a app.asar --restore');
 	})
 	.parse(process.argv);
 
-if (program.archive) {
-	if (program.verbose) process.env.VERBOSE = 'true';
-
-	const asarmor = new Asarmor(program.archive);
-
-	if (program.restore) {
-		asarmor.restoreBackup();
-	}
-	else if (program.output) {
-		if (program.backup)
-			asarmor.createBackup();
-
-		if (program.filetocrash)
-			asarmor.applyProtection(new FileCrash(program.filetocrash));
-		if (program.trashify)
-			asarmor.applyProtection(new Trashify(program.trashify === true ? undefined : program.trashify));
-
-		asarmor.write(program.output);
-	}
-} else {
+if (!program.archive || !program.output) {
 	program.help();
 	program.exit();
+}
+
+if (program.verbose) process.env.VERBOSE = 'true';
+
+const asarmor = new Asarmor(program.archive);
+
+if (program.restore) {
+	asarmor.restoreBackup();
+}
+else if (program.output) {
+	if (program.backup)
+		asarmor.createBackup();
+
+	if (program.filetocrash)
+		asarmor.applyProtection(new FileCrash(program.filetocrash[0], +program.filetocrash[1]));
+	if (program.trashify)
+		asarmor.applyProtection(new Trashify(program.trashify === true ? undefined : program.trashify));
+
+	asarmor.write(program.output);
 }

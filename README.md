@@ -35,7 +35,7 @@ const {Asarmor, FileCrash, Trashify} = require('asarmor');
 
 const asarmor = new Asarmor('app.asar');
 asarmor.createBackup('~/Documents/backups/app.asar.backup');
-asarmor.applyProtection(new FileCrash('target.js'));
+asarmor.applyProtection(new FileCrash('target.js', -999));
 asarmor.applyProtection(new Trashify(['foo', 'bar'], Trashify.Randomizers.randomExtension(['js', 'ts', 'txt'])));
 asarmor.applyProtection(new Trashify(['baz'], Trashify.Randomizers.junkExtension()));
 asarmor.write('app.asar');
