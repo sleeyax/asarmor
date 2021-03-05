@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import { Asarmor, FileCrash } from '../src';
 import Trashify from '../src/protections/trashify';
+import Bloat from '../src/protections/bloat';
 const { version } = require('../package.json');
 
 const program = new Command();
@@ -14,12 +15,14 @@ program
 	.option('-b, --backup', 'create backup')
 	.option('-r, --restore', 'restore backup (protections won\'t be applied)')
 	.option('-f, --filetocrash <filename size...>', 'corrupt specified file within the archive')
+	.option('-b, --bloat [gigabytes]', 'clogs up the hard drive on extraction by adding huge random files to the archive')
 	.option('-t, --trashify [junkfiles...]', 'add non-existing junk files to the archive')
 	.on('--help', () => {
 		console.log('');
 		console.log('Examples:');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --filetocrash index_dummy.js');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --filetocrash index_dummy.js -999');
+		console.log('  $ asarmor -a app.asar -o asarmor.asar --bloat 1000');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --trashify bee-movie.txt foo.js bar.ts');
 		console.log('  $ asarmor -a app.asar -o asarmor.asar --trashify --backup');
 		console.log('  $ asarmor -a app.asar --restore');
@@ -46,6 +49,8 @@ else if (program.output) {
 		asarmor.applyProtection(new FileCrash(program.filetocrash[0], +program.filetocrash[1]));
 	if (program.trashify)
 		asarmor.applyProtection(new Trashify(program.trashify === true ? undefined : program.trashify));
+	if (program.bloat)
+		asarmor.applyProtection(new Bloat(program.bloat === true ? undefined : program.bloat));
 
 	asarmor.write(program.output);
 }
