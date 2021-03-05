@@ -34,7 +34,6 @@ export default class Bloat implements IProtection {
     }
     
     return {
-      content: archive.content,
       headerSize: archive.headerSize,
       header,
     }

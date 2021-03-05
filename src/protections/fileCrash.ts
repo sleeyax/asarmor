@@ -27,7 +27,6 @@ export default class FileCrash implements IProtection {
 			return {
 				headerSize,
 				header,
-				content: archive.content
 			}
 		}
 

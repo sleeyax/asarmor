@@ -3,5 +3,8 @@ import IHeader from './IHeader';
 export default interface IArchive {
 	headerSize: number;
 	header: IHeader;
-	content: Buffer;
+	/**
+	 * @deprecated: protections should not modify archive contents!
+	 */
+	content?: Buffer;
 }

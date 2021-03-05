@@ -62,7 +62,6 @@ export default class Trashify implements IProtection {
     const header = this.addGarbageFiles(archive.header);
 
     return {
-      content: archive.content,
       headerSize: archive.headerSize,
       header
     };
