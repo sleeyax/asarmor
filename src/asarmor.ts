@@ -5,18 +5,24 @@ import IProtection from './interfaces/IProtection';
 const pickle = require('chromium-pickle-js');
 
 export default class Asarmor {
-	private filePath: string;
+	private readonly headerSizeOffset = 8;
+	private readonly filePath: string;
 	private archive: IArchive;
 
 	constructor(filePath: string) {
 		this.filePath = filePath;
+		if (fs.statSync(filePath).size > 2147483648)
+			console.warn('Warning: archive is larger than 2GB. This might take a while.')
 		this.archive = this.readArchive(this.filePath);
 	}
 
-	private readArchiveContents(headerSize: number) {
-		const fileBuf = fs.readFileSync(this.filePath);
-		const start = 8 + headerSize;
-		return fileBuf.slice(start);
+	private readHeaderSize(fd: number) {
+		const sizeBuffer = Buffer.alloc(this.headerSizeOffset);
+		if (fs.readSync(fd, sizeBuffer, 0, this.headerSizeOffset, null) !== this.headerSizeOffset) {
+			throw new Error('Unable to read header size!');
+		}
+		const sizePickle = pickle.createFromBuffer(sizeBuffer);
+		return sizePickle.createIterator().readUInt32();
 	}
 
 	private readArchive(archive: string): IArchive {
@@ -24,12 +30,7 @@ export default class Asarmor {
 
 		try {
 			// Read header size
-			const sizeBuffer = Buffer.alloc(8);
-			if (fs.readSync(fd, sizeBuffer, 0, 8, null) !== 8) {
-				throw new Error('Unable to read header size!');
-			}
-			const sizePickle = pickle.createFromBuffer(sizeBuffer);
-			const _headerSize = sizePickle.createIterator().readUInt32();
+			const _headerSize = this.readHeaderSize(fd);
 
 			// Read header
 			const headerBuffer = Buffer.alloc(_headerSize);
@@ -39,14 +40,12 @@ export default class Asarmor {
 			const headerPickle = pickle.createFromBuffer(headerBuffer);
 			const _header = JSON.parse(headerPickle.createIterator().readString());
 
-			// Read files stored in archive to Buffer
-			const _content = this.readArchiveContents(_headerSize);
+			// NOTE: we skip reading the content because asar files can be quite big and protections should not modify it anyways
 
 			// Returning archive object 
 			return {
 				headerSize: _headerSize,
 				header: _header,
-				content: _content
 			}
 		} catch(e) {
 			throw e;
@@ -71,7 +70,18 @@ export default class Asarmor {
 		const sizeBuffer = sizePickle.toBuffer();
 
 		// Write everything to output file :D
-		fs.writeFileSync(output, Buffer.concat([sizeBuffer, headerBuffer, this.archive.content]));
+		const tmp = output + '.tmp'; // create temp file bcs we can't read & write the same file at the same time
+		const writeStream = fs.createWriteStream(tmp, { flags : 'w' });
+		writeStream.write(sizeBuffer);
+		writeStream.write(headerBuffer);
+		// write unmodified contents
+		const fd = fs.openSync(this.filePath, 'r');
+		const originalHeaderSize = this.readHeaderSize(fd);
+		fs.closeSync(fd);
+		const readStream = fs.createReadStream(this.filePath, {start: this.headerSizeOffset + originalHeaderSize});
+		readStream.pipe(writeStream);
+		readStream.on('close', () => readStream.unpipe());
+		writeStream.on('close', () => fs.renameSync(tmp, output));
 	}
 
 	createBackup(backupPath?: string, force = false) {
