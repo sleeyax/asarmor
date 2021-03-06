@@ -34,7 +34,7 @@ Examples:
 ```
 ### library
 ```javascript
-const {Asarmor, FileCrash, Trashify} = require('asarmor');
+const {Asarmor, FileCrash, Trashify, Bloat} = require('asarmor');
 
 const asarmor = new Asarmor('app.asar');
 asarmor.createBackup('~/Documents/backups/app.asar.backup');
