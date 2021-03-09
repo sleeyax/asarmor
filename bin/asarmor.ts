@@ -15,7 +15,7 @@ program
 	.option('-b, --backup', 'create backup')
 	.option('-r, --restore', 'restore backup (protections won\'t be applied)')
 	.option('-f, --filetocrash <filename size...>', 'corrupt specified file within the archive')
-	.option('-b, --bloat [gigabytes]', 'clogs up the hard drive on extraction by adding huge random files to the archive')
+	.option('-bl, --bloat [gigabytes]', 'clogs up the hard drive on extraction by adding huge random files to the archive')
 	.option('-t, --trashify [junkfiles...]', 'add non-existing junk files to the archive')
 	.on('--help', () => {
 		console.log('');

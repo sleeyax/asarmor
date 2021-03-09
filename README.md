@@ -20,7 +20,7 @@ Options:
   -b, --backup                          create backup
   -r, --restore                         restore backup (protections won't be applied)
   -f, --filetocrash <filename size...>  corrupt specified file within the archive
-  -b, --bloat [gigabytes]               clogs up the hard drive on extraction by adding huge random files to the archive
+  -bl, --bloat [gigabytes]               clogs up the hard drive on extraction by adding huge random files to the archive
   -t, --trashify [junkfiles...]         add non-existing junk files to the archive
   -h, --help                            display help for command
 
