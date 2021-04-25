@@ -58,8 +58,8 @@ export default class Asarmor {
 		this.archive = protection.apply(this.archive);
 	}
 
-	async write(output: string):  Promise<string> {
-		return new Promise(resolve => {
+	async write(outputPath: string):  Promise<string> {
+		return new Promise((resolve, reject) => {
 			// Convert header back to string
 			const headerPickle = pickle.createEmpty();
 			headerPickle.writeString(JSON.stringify(this.archive.header));
@@ -71,10 +71,11 @@ export default class Asarmor {
 			const sizeBuffer = sizePickle.toBuffer();
 
 			// Write everything to output file :D
-			const tmp = output + '.tmp'; // create temp file bcs we can't read & write the same file at the same time
+			const tmp = outputPath + '.tmp'; // create temp file bcs we can't read & write the same file at the same time
 			const writeStream = fs.createWriteStream(tmp, { flags : 'w' });
 			writeStream.write(sizeBuffer);
 			writeStream.write(headerBuffer);
+
 			// write unmodified contents
 			const fd = fs.openSync(this.filePath, 'r');
 			const originalHeaderSize = this.readHeaderSize(fd);
@@ -83,9 +84,10 @@ export default class Asarmor {
 			readStream.pipe(writeStream);
 			readStream.on('close', () => readStream.unpipe());
 			writeStream.on('close', () => {
-				fs.renameSync(tmp, output);
-				resolve(output);
+				fs.renameSync(tmp, outputPath);
+				resolve(outputPath);
 			});
+			writeStream.on('error', reject);
 		});
 	}
 
