@@ -42,7 +42,9 @@ asarmor.applyProtection(new FileCrash('target.js', -999));
 asarmor.applyProtection(new Trashify(['foo', 'bar'], Trashify.Randomizers.randomExtension(['js', 'ts', 'txt'])));
 asarmor.applyProtection(new Trashify(['baz'], Trashify.Randomizers.junkExtension()));
 asarmor.applyProtection(new Bloat(100)); // adds 100 GB of bloat files when 'asar extract' is ran
-asarmor.write('app.asar');
+asarmor.write('app.asar')
+  .then(outputPath => console.log(`successfully wrote changes to ${outputPath}`))
+  .catch(console.error);
 ```
 ### electron-builder
 You can easily include asarmor in your packaging process using an [afterPack](https://www.electron.build/configuration/configuration.html#afterpack) hook:
@@ -56,7 +58,7 @@ exports.default = async ({ appOutDir, packager }) => {
     console.log(`applying asarmor protections to ${asarPath}`);
     const asarmor = new Asarmor(asarPath);
     asarmor.applyProtection(new Trashify(['.git', '.env']));
-    asarmor.write(asarPath);
+    await asarmor.write(asarPath);
   } catch (err) {
     console.error(err);
   }
