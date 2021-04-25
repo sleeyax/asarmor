@@ -52,5 +52,5 @@ else if (program.output) {
 	if (program.bloat)
 		asarmor.applyProtection(new Bloat(program.bloat === true ? undefined : program.bloat));
 
-	asarmor.write(program.output);
+	asarmor.write(program.output).catch(console.error);
 }
