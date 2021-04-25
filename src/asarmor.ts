@@ -58,30 +58,35 @@ export default class Asarmor {
 		this.archive = protection.apply(this.archive);
 	}
 
-	write(output: string) {
-		// Convert header back to string
-		const headerPickle = pickle.createEmpty();
-		headerPickle.writeString(JSON.stringify(this.archive.header));
+	async write(output: string):  Promise<string> {
+		return new Promise(resolve => {
+			// Convert header back to string
+			const headerPickle = pickle.createEmpty();
+			headerPickle.writeString(JSON.stringify(this.archive.header));
 
-		// Read new header size
-		const headerBuffer = headerPickle.toBuffer();
-		const sizePickle = pickle.createEmpty();
-		sizePickle.writeUInt32(headerBuffer.length);
-		const sizeBuffer = sizePickle.toBuffer();
+			// Read new header size
+			const headerBuffer = headerPickle.toBuffer();
+			const sizePickle = pickle.createEmpty();
+			sizePickle.writeUInt32(headerBuffer.length);
+			const sizeBuffer = sizePickle.toBuffer();
 
-		// Write everything to output file :D
-		const tmp = output + '.tmp'; // create temp file bcs we can't read & write the same file at the same time
-		const writeStream = fs.createWriteStream(tmp, { flags : 'w' });
-		writeStream.write(sizeBuffer);
-		writeStream.write(headerBuffer);
-		// write unmodified contents
-		const fd = fs.openSync(this.filePath, 'r');
-		const originalHeaderSize = this.readHeaderSize(fd);
-		fs.closeSync(fd);
-		const readStream = fs.createReadStream(this.filePath, {start: this.headerSizeOffset + originalHeaderSize});
-		readStream.pipe(writeStream);
-		readStream.on('close', () => readStream.unpipe());
-		writeStream.on('close', () => fs.renameSync(tmp, output));
+			// Write everything to output file :D
+			const tmp = output + '.tmp'; // create temp file bcs we can't read & write the same file at the same time
+			const writeStream = fs.createWriteStream(tmp, { flags : 'w' });
+			writeStream.write(sizeBuffer);
+			writeStream.write(headerBuffer);
+			// write unmodified contents
+			const fd = fs.openSync(this.filePath, 'r');
+			const originalHeaderSize = this.readHeaderSize(fd);
+			fs.closeSync(fd);
+			const readStream = fs.createReadStream(this.filePath, {start: this.headerSizeOffset + originalHeaderSize});
+			readStream.pipe(writeStream);
+			readStream.on('close', () => readStream.unpipe());
+			writeStream.on('close', () => {
+				fs.renameSync(tmp, output);
+				resolve(output);
+			});
+		});
 	}
 
 	createBackup(backupPath?: string, force = false) {
