@@ -13,10 +13,10 @@ program
 	.option('-o, --output <output>', 'output asar file (required)')
 	.option('-v, --verbose', 'enable verbose console output')
 	.option('-b, --backup', 'create backup')
-	.option('-r, --restore', 'restore backup (protections won\'t be applied)')
+	.option('-r, --restore', 'restore backup (protections aren\'t applied)')
 	.option('-f, --filetocrash <filename size...>', 'corrupt specified file within the archive')
-	.option('-bl, --bloat [gigabytes]', 'clogs up the hard drive on extraction by adding huge random files to the archive')
-	.option('-t, --trashify [junkfiles...]', 'add non-existing junk files to the archive')
+	.option('-bl, --bloat [gigabytes]', 'add huge random files to disk on extraction attempt')
+	.option('-t, --trashify [junkfiles...]', 'add fake files to the archive')
 	.on('--help', () => {
 		console.log('');
 		console.log('Examples:');

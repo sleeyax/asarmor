@@ -18,10 +18,10 @@ Options:
   -o, --output <output>                 output asar file (required)
   -v, --verbose                         enable verbose console output
   -b, --backup                          create backup
-  -r, --restore                         restore backup (protections won't be applied)
+  -r, --restore                         restore backup (protections aren't applied)
   -f, --filetocrash <filename size...>  corrupt specified file within the archive
-  -bl, --bloat [gigabytes]              clogs up the hard drive on extraction by adding huge random files to the archive
-  -t, --trashify [junkfiles...]         add non-existing junk files to the archive
+  -bl, --bloat [gigabytes]              add huge random files to disk on extraction attempt
+  -t, --trashify [junkfiles...]         add fake files to the archive
   -h, --help                            display help for command
 
 Examples:
@@ -41,7 +41,7 @@ asarmor.createBackup('~/Documents/backups/app.asar.backup');
 asarmor.applyProtection(new FileCrash('target.js', -999));
 asarmor.applyProtection(new Trashify(['foo', 'bar'], Trashify.Randomizers.randomExtension(['js', 'ts', 'txt'])));
 asarmor.applyProtection(new Trashify(['baz'], Trashify.Randomizers.junkExtension()));
-asarmor.applyProtection(new Bloat(100)); // adds 100 GB of bloat files when 'asar extract' is ran
+asarmor.applyProtection(new Bloat(100)); // add 100 GB of bloat files to disk when someone tries to run 'asar extract'
 asarmor.write('app.asar')
   .then(outputPath => console.log(`successfully wrote changes to ${outputPath}`))
   .catch(console.error);
