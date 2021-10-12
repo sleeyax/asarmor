@@ -66,4 +66,4 @@ exports.default = async ({ appOutDir, packager }) => {
 ```
 
 ## support
-If you're experiencing a bug or have a public question, [open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Addional, dedicated support in private will only be provided as a paid service because my time is just as valuable as yours.
+Found a bug or having a question? [Open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Pull Requests are welcome, but please open an issue first if you're adding major changes!
