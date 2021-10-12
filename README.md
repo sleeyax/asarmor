@@ -65,5 +65,15 @@ exports.default = async ({ appOutDir, packager }) => {
 };
 ```
 
+### FAQ
+**Do protections affect my (electron) app performance?**
+
+Nope. Electron can still read your asar file at the same speed as if nothing changed. 
+The same should be true for other frameworks that utilise the asar format (unless the implementation differs drastically for some reason, which is out of my control).
+
+**The 'filecrash' protection broke my app?**
+
+Filecrash is the oldest protection and initial PoC for asarmor and should be avoided if you don't know what you're doing. It will *corrupt* specified file in the archive, so make sure the file you are targetting isn't a valid soure file (e.g. `index.js` or `main.js`) that your app depends on.
+
 ## support
-Found a bug or having a question? [Open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Pull Requests are welcome, but please open an issue first if you're adding major changes!
+Found a bug or have a question? [Open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Pull Requests are welcome, but please open an issue first if you're adding major changes!
