@@ -1,4 +1,5 @@
+import IFileEntries from './IFileEntries';
+
 export default interface IHeader {
-	files: any;
-	[key: string]: any;
+	files: IFileEntries;
 }

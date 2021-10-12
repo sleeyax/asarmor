@@ -2,6 +2,7 @@ import IProtection from '../interfaces/IProtection';
 import IArchive from '../interfaces/IArchive';
 import IHeader from '../interfaces/IHeader';
 import { random, randomItem } from '../helper';
+import IFileEntries from '../interfaces/IFileEntries';
 
 const maxInt = Number.MAX_SAFE_INTEGER;
 
@@ -37,7 +38,7 @@ export default class Trashify implements IProtection {
   private addGarbageFiles(header: IHeader) {
     if (!header.files) return header;
 
-    const garbageFiles: any = {};
+    const garbageFiles: IFileEntries = {};
 
     const garbageFilesCount = random(1, this.fileNames.length);
     for (let i = 0; i < garbageFilesCount; i++) {
@@ -47,11 +48,6 @@ export default class Trashify implements IProtection {
       if (process.env.VERBOSE)
         console.log(`trashify: adding ${fileName} with size ${size} at offset ${offset}`);
       garbageFiles[fileName] = { size, offset };
-    }
-
-    // recursively add more garbage to files in subdirectories
-    for (const [fileName, fileInfo] of Object.entries<IHeader>(header.files)) {
-      garbageFiles[fileName] = this.addGarbageFiles(fileInfo);
     }
 
     return { files: { ...garbageFiles, ...header.files } };
@@ -74,6 +70,7 @@ export default class Trashify implements IProtection {
      * e.g. <filename>.hgd97e, <filename>.08z7ad.js, <filename>.hgd97e.key
      */
     junkExtension: (extension?: string) => (fileName: string) => `${fileName}.${Math.random().toString(36).substr(2, 6)}${extension ? ('.' + extension) : ''}`,
+    
     /**
      * insert random extension
      * 
