@@ -1,6 +1,6 @@
 # asarmor
 CLI tool and library that modifies your asar file to protect it from extraction (e.g by using `asar extract`).
-This is not bulletproof, but can be usefull as a first level of protection.
+This is not bulletproof, but can be useful as a first level of protection.
 
 ## installation
 `$ npm i asarmor`
