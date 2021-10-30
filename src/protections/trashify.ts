@@ -40,8 +40,7 @@ export default class Trashify implements IProtection {
 
     const garbageFiles: IFileEntries = {};
 
-    const garbageFilesCount = random(1, this.fileNames.length);
-    for (let i = 0; i < garbageFilesCount; i++) {
+    for (let i = 0; i < this.fileNames.length; i++) {
       const fileName = this.randomizeFileName(randomItem(this.fileNames));
       const size = Math.floor(random(maxInt / 100, maxInt / 2));
       const offset = Math.floor(Math.random() * (Math.pow(2, 32) - 1));
