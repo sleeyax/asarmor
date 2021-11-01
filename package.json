@@ -6,9 +6,10 @@
   "scripts": {
     "test": "jest",
     "start": "node ./build/bin/asarmor.js",
+    "clean": "rimraf build",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "prepack": "rimraf build && npm run build"
+    "prepack": "npm run clean && npm run build"
   },
   "jest": {
     "modulePathIgnorePatterns": [
