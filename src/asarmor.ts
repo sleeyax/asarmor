@@ -111,9 +111,7 @@ export default class Asarmor {
 			this.archive.header.files = {...patch.header.files, ...this.archive.header.files};
 
 		if (!patch.headerSize && patch.header) {
-			const headerPickle = pickle.createEmpty();
-			headerPickle.writeString(JSON.stringify(this.archive.header))
-			this.archive.headerSize = headerPickle.toBuffer().length;
+			this.archive.headerSize = Buffer.from(JSON.stringify(this.archive.header)).length;
 		} else if (patch.headerSize) {
 			this.archive.headerSize = patch.headerSize;
 		}
