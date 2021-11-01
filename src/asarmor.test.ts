@@ -35,8 +35,12 @@ test('can apply bloat patch', () => {
 
   const archive = asarmor.patch(createBloatPatch({gigabytes: 10}));
   const filenames = Object.keys(archive.header.files);
+  const totalSize = filenames
+    .map(filename => archive.header.files[filename].size)
+    .reduce((x, y) => x + y, 0);
 
   expect(filenames.length).toBe(10);
+  expect(totalSize).toBe(10);
 });
 
 test('can apply trash patch', () => {
