@@ -1,5 +1,5 @@
 const asar = require('asar');
-const {Asarmor, createTrashPatch} = require('../../build/src');
+const asarmor = require('../../build/src');
 const {original, protected} = require('./constants');
 
 (async () => {
@@ -8,10 +8,9 @@ const {original, protected} = require('./constants');
   console.log('built archive:', original);
 
   // apply asarmor patches
-  const asarmor = new Asarmor(original);
-  await asarmor.createBackup();
-  await asarmor.read();
-  asarmor.patch(createTrashPatch());
-  const path = await asarmor.write(protected);
+  const archive = await asarmor.open(original);
+  await archive.createBackup();
+  archive.patch(asarmor.createTrashPatch());
+  const path = await archive.write(protected);
   console.log('protected archive:', path);
 })();

@@ -40,7 +40,7 @@ test('can apply bloat patch', () => {
     .reduce((x, y) => x + y, 0);
 
   expect(filenames.length).toBe(10);
-  expect(totalSize).toBe(10);
+  expect(totalSize).toBe(10737418240);
 });
 
 test('can apply trash patch', () => {
@@ -68,9 +68,4 @@ test('can apply trash patch', () => {
 
   expect(invalidExtension).toBe(false);
   expect(invalidName).toBe(false);
-});
-
-test('throws error when archive not read/parsed yet', async () => {
-  const asarmor = new Asarmor('test');
-  await expect(asarmor.write('test')).rejects.toBeInstanceOf(Error);
 });

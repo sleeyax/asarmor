@@ -2,8 +2,63 @@ import fsAsync, { FileHandle } from 'fs/promises';
 import fs from 'fs';
 import { Archive } from './asar';
 import { createBloatPatch, createTrashPatch } from '.';
+import { PartialBy } from './helpers';
 
 const pickle = require('chromium-pickle-js');
+
+const headerSizeOffset = 8;
+
+async function readHeaderSize(handle: FileHandle) {
+	const sizeBuffer = Buffer.alloc(headerSizeOffset);
+	const {bytesRead} = await handle.read(sizeBuffer, 0, headerSizeOffset, null);
+
+	if (bytesRead !== headerSizeOffset)
+		throw new Error('Unable to read header size!');
+
+	const sizePickle = pickle.createFromBuffer(sizeBuffer);
+
+	return sizePickle.createIterator().readUInt32();
+}
+
+async function readArchive(filePath: string): Promise<Archive> {
+	const handle = await fsAsync.open(filePath, 'r');
+
+	// Read header size
+	const headerSize = await readHeaderSize(handle);
+
+	// Read header
+	const headerBuffer = Buffer.alloc(headerSize);
+	const {bytesRead} = await handle.read(headerBuffer, 0, headerSize, null);
+	await handle.close();
+
+	if (bytesRead !== headerSize)
+		throw new Error('Unable to read header!');
+	
+	const headerPickle = pickle.createFromBuffer(headerBuffer);
+	const header = JSON.parse(headerPickle.createIterator().readString());
+
+	// Returning archive object 
+	return {
+		headerSize,
+		header,
+	}
+}
+
+/**
+ * Read and parse an asar archive.
+ * 
+ * This can take a while depending on the size of the file.
+ */
+async function read(filePath: string) {
+	const {size: fileSize} = await fsAsync.stat(filePath);
+
+	if (fileSize > 2147483648)
+		console.warn('Warning: archive is larger than 2GB. This might take a while.');
+
+	const archive = await readArchive(filePath);
+
+	return archive;
+}
 
 type BackupOptions = {
 	/**
@@ -31,73 +86,21 @@ type RestoreBackupOptions = BackupOptions & {
 }
 
 export default class Asarmor {
-	private readonly headerSizeOffset = 8;
 	private readonly filePath: string;
-	private archive?: Archive;
-
-	constructor(archivePath: string, archive?: Archive) {
-		this.filePath = archivePath;
-		this.archive = archive;
-	}
-
-	private async readHeaderSize(handle: FileHandle) {
-		const sizeBuffer = Buffer.alloc(this.headerSizeOffset);
-		const {bytesRead} = await handle.read(sizeBuffer, 0, this.headerSizeOffset, null);
-
-		if (bytesRead !== this.headerSizeOffset)
-			throw new Error('Unable to read header size!');
-
-		const sizePickle = pickle.createFromBuffer(sizeBuffer);
-
-		return sizePickle.createIterator().readUInt32();
-	}
-
-	private async readArchive(filePath: string): Promise<Archive> {
-		const handle = await fsAsync.open(filePath, 'r');
-
-		// Read header size
-		const headerSize = await this.readHeaderSize(handle);
-
-		// Read header
-		const headerBuffer = Buffer.alloc(headerSize);
-		const {bytesRead} = await handle.read(headerBuffer, 0, headerSize, null);
-		await handle.close();
-
-		if (bytesRead !== headerSize)
-			throw new Error('Unable to read header!');
-		
-		const headerPickle = pickle.createFromBuffer(headerBuffer);
-		const header = JSON.parse(headerPickle.createIterator().readString());
-
-		// Returning archive object 
-		return {
-			headerSize,
-			header,
-		}
-	}
+	private archive: Archive;
 
 	/**
-	 * Read and parse the asar archive.
-	 * 
-	 * This can take a while depending on the size of the file.
+	 * @deprecated: use the top-level asarmor.open() function to construct a new instance instead.
 	 */
-	async read() {
-		const {size: fileSize} = await fsAsync.stat(this.filePath);
-
-		if (fileSize > 2147483648)
-			console.warn('Warning: archive is larger than 2GB. This might take a while.');
-
-		this.archive = await this.readArchive(this.filePath);
-
-		return this.archive;
+	constructor(archivePath: string, archive: Archive) {
+		this.filePath = archivePath;
+		this.archive = archive;
 	}
 
 	/**
 	 * Apply a patch to the asar archive.
 	 */
-	patch(patch?: Archive): Archive {
-		if (!this.archive) throw new Error('Archive not read yet! Call read() before using this method.');
-
+	patch(patch?: PartialBy<Archive, 'headerSize'>): Archive {
 		if (!patch) {
 			this.patch(createTrashPatch());
 			this.patch(createBloatPatch());
@@ -106,7 +109,7 @@ export default class Asarmor {
 
 		this.archive.header.files = {...patch.header.files, ...this.archive.header.files};
 
-		if (patch.headerSize === 0) {
+		if (!patch.headerSize) {
 			const headerPickle = pickle.createEmpty();
 			headerPickle.writeString(JSON.stringify(this.archive.header))
 			this.archive.headerSize = headerPickle.toBuffer().length;
@@ -121,8 +124,6 @@ export default class Asarmor {
 	 * Write modified asar archive to given absolute file path.
 	 */
 	async write(outputPath: string): Promise<string> {
-		if (!this.archive) throw new Error('Archive not read yet! Call read() before using this method.');
-
 		// Convert header back to string
 		const headerPickle = pickle.createEmpty();
 		headerPickle.writeString(JSON.stringify(this.archive.header));
@@ -141,9 +142,9 @@ export default class Asarmor {
 
 		// write unmodified contents
 		const fd = await fsAsync.open(this.filePath, 'r');
-		const originalHeaderSize = await this.readHeaderSize(fd);
+		const originalHeaderSize = await readHeaderSize(fd);
 		await fd.close();
-		const readStream = fs.createReadStream(this.filePath, {start: this.headerSizeOffset + originalHeaderSize});
+		const readStream = fs.createReadStream(this.filePath, {start: headerSizeOffset + originalHeaderSize});
 		readStream.pipe(writeStream);
 		readStream.on('close', () => readStream.unpipe());
 
@@ -171,4 +172,19 @@ export default class Asarmor {
 			if (options?.remove) await fsAsync.unlink(backupPath);
 		}
 	}
+}
+
+/**
+ * Open and prepare asar archive file for modifications.
+ */
+export async function open(asarFilePath: string) {
+	const archive = await read(asarFilePath);
+	return new Asarmor(asarFilePath, archive);
+}
+
+/**
+ * Alias of `asarmor.write()`.
+ */
+export async function close(asarmor: Asarmor, outputfilePath: string) {
+	return asarmor.write(outputfilePath);
 }
