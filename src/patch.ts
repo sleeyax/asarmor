@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import { Archive, FileEntries } from './asar';
-import { random } from './helpers';
+import { createNestedObject, random } from './helpers';
 
 export type Patch = Partial<Archive>;
 
@@ -56,17 +56,35 @@ export function createTrashPatch(options?: {
       'development',
       'staging',
       'secrets',
+      'test/test1.js',
+      'test/test2.js',
+      'test/test3.js',
     ];
   if (!options.beforeWrite) options.beforeWrite = (f) => f;
   const {beforeWrite, filenames} = options;
 
-  const files: FileEntries = {};
-
+  let files: FileEntries = {};
+  
   for (const filename of filenames) {
     const fileName = beforeWrite(filename);
     const size = Math.floor(random(1, Number.MAX_VALUE / 2));
     const offset = Math.floor(Math.random() * (Math.pow(2, 32) - 1));
-    files[fileName] = { size, offset };
+    
+    // files in directpries
+    // e.g. a/b/foo.txt, a\\b\\foo.txt
+    let subdirs = filename.split(/[\/\\]/);
+    if (subdirs.length > 1) {
+      subdirs = subdirs.join('_files_').split('_'); // subdirs: ['a', 'foo.txt'] -> ['a', 'files', 'foo.txt']
+      const parent = subdirs.shift()!; // subdirs: ['a', 'files', 'foo.txt'] -> ['files', 'foo.txt']
+      const obj: any = files[parent] || {};
+      createNestedObject(obj, subdirs, {size, offset});
+      files[parent] = obj;
+    } 
+    // regular file
+    // e.g. foo.txt
+    else {
+      files[fileName] = { size, offset };
+    }
   }
 
   return {

@@ -11,7 +11,7 @@ export interface File {
 };
 
 export interface FileEntries {
-  [filename: string]: File;
+  [filename: string]: File | Header;
 }
 
 export interface Header {
