@@ -1,107 +1,171 @@
+import fsAsync, { FileHandle } from 'fs/promises';
 import fs from 'fs';
-import IArchive from './interfaces/IArchive';
-import IProtection from './interfaces/IProtection';
+import { Archive } from './asar';
+import { arch } from 'os';
 
 const pickle = require('chromium-pickle-js');
+
+type BackupOptions = {
+	/**
+	 * Absolute path to the asar archive file to backup.
+	 */
+	backupPath?: string;
+}
+
+type CreateBackupOptions = BackupOptions & {
+	/**
+	 * Overwrite existing backup.
+	 * 
+	 * Defaults to `false`.
+	 */ 
+	overwrite?: boolean
+}
+
+type RestoreBackupOptions = BackupOptions & {
+	/**
+	 * Whether or not to remove the backup after restoration is complete.
+	 * 
+	 * Defaults to `true`.
+	 */
+	remove?: boolean;
+}
 
 export default class Asarmor {
 	private readonly headerSizeOffset = 8;
 	private readonly filePath: string;
-	private archive: IArchive;
+	private archive?: Archive;
 
-	constructor(filePath: string) {
-		this.filePath = filePath;
-		if (fs.statSync(filePath).size > 2147483648)
-			console.warn('Warning: archive is larger than 2GB. This might take a while.')
-		this.archive = this.readArchive(this.filePath);
+	constructor(archive: string | Archive) {
+		if (typeof arch == 'string') {
+			this.filePath = archive as any;
+		} else {
+			this.filePath = '';
+			this.archive = archive as any;
+		}
 	}
 
-	private readHeaderSize(fd: number) {
+	private async readHeaderSize(handle: FileHandle) {
 		const sizeBuffer = Buffer.alloc(this.headerSizeOffset);
-		if (fs.readSync(fd, sizeBuffer, 0, this.headerSizeOffset, null) !== this.headerSizeOffset) {
+		const {bytesRead} = await fsAsync.read(handle, sizeBuffer, 0, this.headerSizeOffset, null);
+
+		if (bytesRead !== this.headerSizeOffset)
 			throw new Error('Unable to read header size!');
-		}
+
 		const sizePickle = pickle.createFromBuffer(sizeBuffer);
+
 		return sizePickle.createIterator().readUInt32();
 	}
 
-	private readArchive(archive: string): IArchive {
-		const fd = fs.openSync(archive, 'r');
+	private async readArchive(filePath: string): Promise<Archive> {
+		const handle = await fsAsync.open(filePath, 'r');
 
-		try {
-			// Read header size
-			const _headerSize = this.readHeaderSize(fd);
+		// Read header size
+		const headerSize = await this.readHeaderSize(handle);
 
-			// Read header
-			const headerBuffer = Buffer.alloc(_headerSize);
-			if (fs.readSync(fd, headerBuffer, 0, _headerSize, null) !== _headerSize) {
-				throw new Error('Unable to read header!');
-			}
-			const headerPickle = pickle.createFromBuffer(headerBuffer);
-			const _header = JSON.parse(headerPickle.createIterator().readString());
+		// Read header
+		const headerBuffer = Buffer.alloc(headerSize);
+		const {bytesRead} = await fsAsync.read(handle, headerBuffer, 0, headerSize, null);
+		await handle.close();
 
-			// NOTE: we skip reading the content because asar files can be quite big and protections should not modify it anyways
+		if (bytesRead !== headerSize)
+			throw new Error('Unable to read header!');
+		
+		const headerPickle = pickle.createFromBuffer(headerBuffer);
+		const header = JSON.parse(headerPickle.createIterator().readString());
 
-			// Returning archive object 
-			return {
-				headerSize: _headerSize,
-				header: _header,
-			}
-		} catch(e) {
-			throw e;
-		} finally {
-			fs.closeSync(fd);
+		// Returning archive object 
+		return {
+			headerSize,
+			header,
 		}
 	}
 
-	applyProtection(protection: IProtection) {
-		this.archive = protection.apply(this.archive);
+	/**
+	 * Reads an asar archive from given absolute path.
+	 * 
+	 * This can take a while depending on the size of the file. 
+	 */
+	async read(archivePath: string) {
+		const {size: fileSize} = await fsAsync.stat(archivePath);
+
+		if (fileSize > 2147483648)
+			console.warn('Warning: archive is larger than 2GB. This might take a while.');
+
+		this.archive = await this.readArchive(archivePath);
+		return this.archive;
 	}
 
-	async write(outputPath: string):  Promise<string> {
-		return new Promise((resolve, reject) => {
-			// Convert header back to string
+	/**
+	 * Apply a patch to the asar archive.
+	 */
+	patch(patch: Archive) {
+		if (!this.archive) throw new Error('Archive not read yet! Call read() before using this method.');
+
+		this.archive.header.files = {...patch.header.files, ...this.archive.header.files};
+
+		if (patch.headerSize === 0) {
 			const headerPickle = pickle.createEmpty();
-			headerPickle.writeString(JSON.stringify(this.archive.header));
+			headerPickle.writeString(JSON.stringify(this.archive.header))
+			this.archive.headerSize = headerPickle.toBuffer().length;
+		} else {
+			this.archive.headerSize = patch.headerSize;
+		}
 
-			// Read new header size
-			const headerBuffer = headerPickle.toBuffer();
-			const sizePickle = pickle.createEmpty();
-			sizePickle.writeUInt32(headerBuffer.length);
-			const sizeBuffer = sizePickle.toBuffer();
+		return this.archive;
+	}
 
-			// Write everything to output file :D
-			const tmp = outputPath + '.tmp'; // create temp file bcs we can't read & write the same file at the same time
-			const writeStream = fs.createWriteStream(tmp, { flags : 'w' });
-			writeStream.write(sizeBuffer);
-			writeStream.write(headerBuffer);
+	/**
+	 * Write modified asar archive to given absolute file path.
+	 */
+	async write(outputPath: string): Promise<string> {
+		if (!this.archive) throw new Error('Archive not read yet! Call read() before using this method.');
 
-			// write unmodified contents
-			const fd = fs.openSync(this.filePath, 'r');
-			const originalHeaderSize = this.readHeaderSize(fd);
-			fs.closeSync(fd);
-			const readStream = fs.createReadStream(this.filePath, {start: this.headerSizeOffset + originalHeaderSize});
-			readStream.pipe(writeStream);
-			readStream.on('close', () => readStream.unpipe());
+		// Convert header back to string
+		const headerPickle = pickle.createEmpty();
+		headerPickle.writeString(JSON.stringify(this.archive.header));
+
+		// Read new header size
+		const headerBuffer = headerPickle.toBuffer();
+		const sizePickle = pickle.createEmpty();
+		sizePickle.writeUInt32(headerBuffer.length);
+		const sizeBuffer = sizePickle.toBuffer();
+
+		// Write everything to output file :D
+		const tmp = outputPath + '.tmp'; // create temp file bcs we can't read & write the same file at the same time
+		const writeStream = fs.createWriteStream(tmp, { flags : 'w' });
+		writeStream.write(sizeBuffer);
+		writeStream.write(headerBuffer);
+
+		// write unmodified contents
+		const fd = await fsAsync.open(this.filePath, 'r');
+		const originalHeaderSize = await this.readHeaderSize(fd);
+		await fd.close();
+		const readStream = fs.createReadStream(this.filePath, {start: this.headerSizeOffset + originalHeaderSize});
+		readStream.pipe(writeStream);
+		readStream.on('close', () => readStream.unpipe());
+
+		return new Promise((resolve, reject) => {
 			writeStream.on('close', () => {
 				fs.renameSync(tmp, outputPath);
 				resolve(outputPath);
 			});
 			writeStream.on('error', reject);
-		});
+		});	
 	}
 
-	createBackup(backupPath?: string, force = false) {
+	async createBackup({backupPath, overwrite = false}: CreateBackupOptions) {
 		backupPath = backupPath || this.filePath + '.bak';
-		if (!fs.existsSync(backupPath) || force)
-			fs.copyFileSync(this.filePath, backupPath);
+
+		if (!fs.existsSync(backupPath) || overwrite)
+			await fsAsync.copyFile(this.filePath, backupPath);
 	}
 
-	restoreBackup(backupPath?: string, remove = true) {
+	async restoreBackup({backupPath, remove = true}: RestoreBackupOptions) {
 		backupPath = backupPath || this.filePath + '.bak';
+
 		if (fs.existsSync(backupPath)) {
-			fs.copyFileSync(backupPath, this.filePath);
-			if (remove) fs.unlinkSync(backupPath);
+			await fsAsync.copyFile(backupPath, this.filePath);
+			if (remove) await fsAsync.unlink(backupPath);
 		}
 	}
 }

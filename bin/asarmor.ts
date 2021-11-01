@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+/* #!/usr/bin/env node
 import { Command } from 'commander';
 import { Asarmor, FileCrash } from '../src';
 import Trashify from '../src/protections/trashify';
@@ -54,3 +54,4 @@ else if (program.output) {
 
 	asarmor.write(program.output).catch(console.error);
 }
+ */
