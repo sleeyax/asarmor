@@ -33,7 +33,7 @@ test('can apply bloat patch', () => {
     headerSize: 0
   });
 
-  const archive = asarmor.patch(createBloatPatch({gigabytes: 10}));
+  const archive = asarmor.patch(createBloatPatch(10));
   const filenames = Object.keys(archive.header.files);
   const totalSize = filenames
     .map(filename => archive.header.files[filename].size)
@@ -68,4 +68,9 @@ test('can apply trash patch', () => {
 
   expect(invalidExtension).toBe(false);
   expect(invalidName).toBe(false);
+});
+
+test('throws error when archive not read/parsed yet', async () => {
+  const asarmor = new Asarmor('test');
+  await expect(asarmor.write('test')).rejects.toBeInstanceOf(Error);
 });

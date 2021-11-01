@@ -1,6 +1,7 @@
 import fsAsync, { FileHandle } from 'fs/promises';
 import fs from 'fs';
 import { Archive } from './asar';
+import { createBloatPatch, createTrashPatch } from '.';
 
 const pickle = require('chromium-pickle-js');
 
@@ -94,8 +95,14 @@ export default class Asarmor {
 	/**
 	 * Apply a patch to the asar archive.
 	 */
-	patch(patch: Archive) {
+	patch(patch?: Archive): Archive {
 		if (!this.archive) throw new Error('Archive not read yet! Call read() before using this method.');
+
+		if (!patch) {
+			this.patch(createTrashPatch());
+			this.patch(createBloatPatch());
+			return this.archive;
+		}
 
 		this.archive.header.files = {...patch.header.files, ...this.archive.header.files};
 
