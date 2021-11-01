@@ -1,0 +1,17 @@
+{
+  "name": "asarmor-node-example",
+  "version": "1.0.0",
+  "description": "Asarmor Node.js demo",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "node build.js",
+    "test": "node test.js"
+  },
+  "keywords": [],
+  "author": "Sleeyax",
+  "license": "MIT",
+  "dependencies": {
+    "asar": "^3.1.0",
+    "asar-node": "^2.1.3"
+  }
+}

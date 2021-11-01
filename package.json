@@ -10,6 +10,9 @@
     "build:watch": "tsc --watch",
     "prepack": "rimraf build && npm run build"
   },
+  "jest": {
+    "modulePathIgnorePatterns": ["example"]
+  },
   "author": "Sleeyax",
   "license": "MIT",
   "dependencies": {
