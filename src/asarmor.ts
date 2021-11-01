@@ -2,7 +2,7 @@ import fsAsync, { FileHandle } from 'fs/promises';
 import fs from 'fs';
 import { Archive } from './asar';
 import { createBloatPatch, createTrashPatch } from '.';
-import { PartialBy } from './helpers';
+import { Patch } from './patch';
 
 const pickle = require('chromium-pickle-js');
 
@@ -100,20 +100,21 @@ export default class Asarmor {
 	/**
 	 * Apply a patch to the asar archive.
 	 */
-	patch(patch?: PartialBy<Archive, 'headerSize'>): Archive {
+	patch(patch?: Patch): Archive {
 		if (!patch) {
 			this.patch(createTrashPatch());
 			this.patch(createBloatPatch());
 			return this.archive;
 		}
 
-		this.archive.header.files = {...patch.header.files, ...this.archive.header.files};
+		if (patch.header)
+			this.archive.header.files = {...patch.header.files, ...this.archive.header.files};
 
-		if (!patch.headerSize) {
+		if (!patch.headerSize && patch.header) {
 			const headerPickle = pickle.createEmpty();
 			headerPickle.writeString(JSON.stringify(this.archive.header))
 			this.archive.headerSize = headerPickle.toBuffer().length;
-		} else {
+		} else if (patch.headerSize) {
 			this.archive.headerSize = patch.headerSize;
 		}
 

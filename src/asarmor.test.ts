@@ -17,7 +17,6 @@ test('can patch archive', () => {
         'bar.txt': {offset: 0, size: 0}
       },
     },
-    headerSize: 0
   });
 
   const fileNames = Object.keys(archive.header.files);

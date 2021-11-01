@@ -1,7 +1,8 @@
 import { randomBytes } from 'crypto';
-import { Archive } from '.';
-import { FileEntries } from './asar';
+import { Archive, FileEntries } from './asar';
 import { random } from './helpers';
+
+export type Patch = Partial<Archive>;
 
 /**
  * Adds a bunch of random files with large sizes to the archive.
@@ -10,7 +11,7 @@ import { random } from './helpers';
  * 
  * Defaults to `100 GB` of bloat.
  */
-export function createBloatPatch(gigabytes = 10) : Archive {
+export function createBloatPatch(gigabytes = 10): Patch {
   const files: FileEntries = {};
  
   for (let i = 0; i < gigabytes; i++) {
@@ -26,7 +27,6 @@ export function createBloatPatch(gigabytes = 10) : Archive {
     header: {
       files,
     },
-    headerSize: 0
   };
 }
 
@@ -47,7 +47,7 @@ export function createTrashPatch(options?: {
    * Example: (filename: string) => filename + ".txt"
    */
   beforeWrite?: (fileName: string) => string
-}) : Archive {
+}) : Patch {
   if (!options) options = {};
   if (!options.filenames || options?.filenames.length == 0)
     options.filenames = [
@@ -70,7 +70,6 @@ export function createTrashPatch(options?: {
   }
 
   return {
-    header: {files},
-    headerSize: 0
+    header: {files}
   };
 }
