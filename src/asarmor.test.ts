@@ -2,7 +2,7 @@ import { createBloatPatch, createTrashPatch } from '.';
 import Asarmor from './asarmor';
 
 test('can patch archive', () => {
-  const asarmor = new Asarmor({
+  const asarmor = new Asarmor('', {
     header: {
       files: {
         'foo.txt': {offset: 0, size: 0}
@@ -26,7 +26,7 @@ test('can patch archive', () => {
 });
 
 test('can apply bloat patch', () => {
-  const asarmor = new Asarmor({
+  const asarmor = new Asarmor('', {
     header: {
       files: {}
     },
@@ -44,7 +44,7 @@ test('can apply bloat patch', () => {
 });
 
 test('can apply trash patch', () => {
-  const asarmor = new Asarmor({
+  const asarmor = new Asarmor('', {
     header: {
       files: {}
     },

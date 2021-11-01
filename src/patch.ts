@@ -8,16 +8,18 @@ import { random } from './helpers';
  * 
  * This patch will result in huge files being written to disk upon extraction with `asar extract`, so use at your own risk AND responsibility!
  */
-export function createBloatPatch({gigabytes: gigabytes}: {
+export function createBloatPatch({gigabytes = 100}: {
   /**
    * Total amount of gigabytes of bloat to add.
+   * 
+   * Defaults to `100`.
    */
   gigabytes: number,
 }) : Archive {
   const files: FileEntries = {};
  
   for (let i = 0; i < gigabytes; i++) {
-    // generate unqiue but random string
+    // generate unique but random string
     let filename = randomBytes(30).toString('hex');
     while (Object.keys(files).indexOf(filename) > -1)
       filename = randomBytes(30).toString('hex');
@@ -38,7 +40,7 @@ export function createBloatPatch({gigabytes: gigabytes}: {
  * 
  * Extraction using `asar extract` will fail as a result.
  */
-export function createTrashPatch({filenames, beforeWrite}: {
+export function createTrashPatch(options?: {
   /**
    * List of files to add.
    */
@@ -51,15 +53,18 @@ export function createTrashPatch({filenames, beforeWrite}: {
    */
   beforeWrite?: (fileName: string) => string
 }) : Archive {
-  if (!filenames || filenames.length == 0)
-    filenames = [
+  if (!options) options = {};
+  if (!options.filenames || options?.filenames.length == 0)
+    options.filenames = [
       'license',
       'production',
       'development',
       'staging',
       'secrets',
     ];
-  if (!beforeWrite) beforeWrite = (f) => f;
+  if (!options.beforeWrite) options.beforeWrite = (f) => f;
+  const {beforeWrite, filenames} = options;
+
   const files: FileEntries = {};
 
   for (const filename of filenames) {

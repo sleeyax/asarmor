@@ -1,7 +1,6 @@
 import fsAsync, { FileHandle } from 'fs/promises';
 import fs from 'fs';
 import { Archive } from './asar';
-import { arch } from 'os';
 
 const pickle = require('chromium-pickle-js');
 
@@ -35,18 +34,14 @@ export default class Asarmor {
 	private readonly filePath: string;
 	private archive?: Archive;
 
-	constructor(archive: string | Archive) {
-		if (typeof arch == 'string') {
-			this.filePath = archive as any;
-		} else {
-			this.filePath = '';
-			this.archive = archive as any;
-		}
+	constructor(archivePath: string, archive?: Archive) {
+		this.filePath = archivePath;
+		this.archive = archive;
 	}
 
 	private async readHeaderSize(handle: FileHandle) {
 		const sizeBuffer = Buffer.alloc(this.headerSizeOffset);
-		const {bytesRead} = await fsAsync.read(handle, sizeBuffer, 0, this.headerSizeOffset, null);
+		const {bytesRead} = await handle.read(sizeBuffer, 0, this.headerSizeOffset, null);
 
 		if (bytesRead !== this.headerSizeOffset)
 			throw new Error('Unable to read header size!');
@@ -64,7 +59,7 @@ export default class Asarmor {
 
 		// Read header
 		const headerBuffer = Buffer.alloc(headerSize);
-		const {bytesRead} = await fsAsync.read(handle, headerBuffer, 0, headerSize, null);
+		const {bytesRead} = await handle.read(headerBuffer, 0, headerSize, null);
 		await handle.close();
 
 		if (bytesRead !== headerSize)
@@ -81,17 +76,18 @@ export default class Asarmor {
 	}
 
 	/**
-	 * Reads an asar archive from given absolute path.
+	 * Read and parse the asar archive.
 	 * 
-	 * This can take a while depending on the size of the file. 
+	 * This can take a while depending on the size of the file.
 	 */
-	async read(archivePath: string) {
-		const {size: fileSize} = await fsAsync.stat(archivePath);
+	async read() {
+		const {size: fileSize} = await fsAsync.stat(this.filePath);
 
 		if (fileSize > 2147483648)
 			console.warn('Warning: archive is larger than 2GB. This might take a while.');
 
-		this.archive = await this.readArchive(archivePath);
+		this.archive = await this.readArchive(this.filePath);
+
 		return this.archive;
 	}
 
@@ -153,19 +149,19 @@ export default class Asarmor {
 		});	
 	}
 
-	async createBackup({backupPath, overwrite = false}: CreateBackupOptions) {
-		backupPath = backupPath || this.filePath + '.bak';
+	async createBackup(options?: CreateBackupOptions) {
+		const backupPath = options?.backupPath || this.filePath + '.bak';
 
-		if (!fs.existsSync(backupPath) || overwrite)
+		if (!fs.existsSync(backupPath) || options?.overwrite)
 			await fsAsync.copyFile(this.filePath, backupPath);
 	}
 
-	async restoreBackup({backupPath, remove = true}: RestoreBackupOptions) {
-		backupPath = backupPath || this.filePath + '.bak';
+	async restoreBackup(options?: RestoreBackupOptions) {
+		const backupPath = options?.backupPath || this.filePath + '.bak';
 
 		if (fs.existsSync(backupPath)) {
 			await fsAsync.copyFile(backupPath, this.filePath);
-			if (remove) await fsAsync.unlink(backupPath);
+			if (options?.remove) await fsAsync.unlink(backupPath);
 		}
 	}
 }
