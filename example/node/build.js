@@ -7,7 +7,7 @@ const {original, protected} = require('./constants');
   await asar.createPackageFromFiles('.', original, ['src/index.js', 'src/sum.js', 'package.json']);
   console.log('built archive:', original);
 
-  // apply asarmor protections
+  // apply asarmor patches
   const asarmor = new Asarmor(original);
   await asarmor.createBackup();
   await asarmor.read();
