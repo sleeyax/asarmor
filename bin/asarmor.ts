@@ -32,11 +32,11 @@ async function main() {
 	const asarmor = await open(program.archive);
 	
 	if (program.restore) {
-		asarmor.restoreBackup();
+		await asarmor.restoreBackup();
 	}
 	else if (program.output) {
 		if (program.backup)
-			asarmor.createBackup();
+			await asarmor.createBackup();
 	
 		if (program.trashify)
 			asarmor.patch(createTrashPatch({
