@@ -3,7 +3,9 @@ CLI tool and library that modifies your asar file to protect it from extraction 
 This is not bulletproof, but can be useful as a first level of protection.
 
 ## installation
-`$ npm i asarmor`
+Install as local library: `$ npm install --save-dev asarmor`
+
+Install as global CLI app: `$ npm install -g asarmor`
 
 ## usage
 
@@ -36,13 +38,14 @@ const asarmor = require('asarmor');
 
 (async () => {
   // Read & parse the asar file.
-  // This can take a while depending on the size.
+  // This can take a while depending on the size of your file.
   const archive = await asarmor.open('app.asar');
 
   // Create a backup, which can be restored at any point in time through CLI or code.
   await archive.createBackup({backupPath: '~/Documents/backups/app.asar.backup'});
 
-  // Apply customized trash patch; this will make sure `asar extract` fails.
+  // Apply customized trash patch.
+  // The trash patch by itself will make sure `asar extract` fails.
   archive.patch(asarmor.createTrashPatch({
     filenames: ['foo', 'bar'],
     beforeWrite: (filename) => {
@@ -52,10 +55,11 @@ const asarmor = require('asarmor');
     }
   }));
 
-  // Apply customized bloat patch; this will write randomness to disk on extraction attempt.
+  // Apply customized bloat patch.
+  // The bloat patch by itself will write randomness to disk on extraction attempt.
   archive.patch(asarmor.createBloatPatch(50)); // adds 50 GB of bloat in total
 
-  // Write result back to file.
+  // Write changes back to disk.
   const outputPath = await archive.write('app.asar');
   console.log('successfully wrote changes to ' + outputPath);
 })();
@@ -69,7 +73,7 @@ const asarmor = require('asarmor');
   const archive = await asarmor.open('app.asar');
 
   // Apply a fully customized patch.
-  // Play around with the different values to see what works best for your usecase.
+  // Play around with the different values to see what works best for you.
   archive.patch({
     header: {
       files: {
