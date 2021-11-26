@@ -118,3 +118,8 @@ The same should be true for other frameworks that utilise the asar format (unles
 
 ## support
 Found a bug or have a question? [Open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Pull Requests are welcome, but please open an issue first if you're adding major changes!
+
+## related projects
+Here are some other interesting projects (besides [asar](https://www.npmjs.com/package/asar) of course) I came across and/or might have taken inspiration from while researching the asar format:
+* [asarbreak](https://www.npmjs.com/package/asarbreak)
+* [patch-asar](https://www.npmjs.com/package/patch-asar)
