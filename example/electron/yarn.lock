@@ -2539,7 +2539,7 @@ fd-slicer@~1.1.0:
 
 figgy-pudding@^3.5.1:
   version "3.5.2"
-  resolved "https://registry.npmjs.org/figgy-pudding/-/figgy-pudding-3.5.2.tgz"
+  resolved "https://registry.yarnpkg.com/figgy-pudding/-/figgy-pudding-3.5.2.tgz#b4eee8148abb01dcf1d1ac34367d59e12fa61d6e"
 
 file-loader@^6.0.0:
   version "6.0.0"
@@ -5059,8 +5059,8 @@ sprintf-js@~1.0.2:
   resolved "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz"
 
 ssri@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.npmjs.org/ssri/-/ssri-6.0.1.tgz"
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/ssri/-/ssri-6.0.2.tgz#157939134f20464e7301ddba3e90ffa8f7728ac5"
   dependencies:
     figgy-pudding "^3.5.1"
 
