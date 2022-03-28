@@ -1,5 +1,5 @@
+const { join } = require('path');
 const asarmor = require('../../build/src');
-const { join } = require("path");
 
 exports.default = async ({ appOutDir, packager }) => {
   try {
