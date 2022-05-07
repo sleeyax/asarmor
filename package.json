@@ -19,6 +19,7 @@
   "author": "Sleeyax",
   "license": "MIT",
   "dependencies": {
+    "asar": "^3.1.0",
     "chromium-pickle-js": "^0.2.0",
     "commander": "^6.1.0"
   },
