@@ -7,7 +7,13 @@
     "test": "jest",
     "start": "node ./build/bin/asarmor.js",
     "clean": "rimraf build",
-    "build": "tsc",
+    "prepare": "node ./scripts/keygen.js && node ./scripts/js2c.js",
+    "gyp:config": "node ./node_modules/node-gyp/bin/node-gyp.js configure --target=16.0.2 --disturl=https://electronjs.org/headers",
+    "gyp:build": "node ./node_modules/node-gyp/bin/node-gyp.js build",
+    "gyp:build:debug": "node ./node_modules/node-gyp/bin/node-gyp.js build --debug",
+    "gyp": "npm run gyp:config && npm run gyp:build",
+    "keygen": "node ./scripts/keygen.js",
+    "build": "npm run prepare && npm run gyp && tsc",
     "build:watch": "tsc --watch",
     "prepack": "npm run clean && npm run build"
   },
@@ -44,7 +50,10 @@
     "@types/node": "^14.6.4",
     "babel-jest": "^27.3.1",
     "jest": "^27.3.1",
+    "node-addon-api": "^5.0.0",
+    "node-gyp": "^9.0.0",
     "rimraf": "^3.0.2",
+    "terser": "^5.13.1",
     "typescript": "^4.0.2"
   }
 }
