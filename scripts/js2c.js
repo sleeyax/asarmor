@@ -6,16 +6,13 @@
 
 // TODO: include all *.js files from bootstrap/*.js automatically?
 
-const fs = require('fs');
+const fs = require('fs/promises');
 const { join } = require('path');
 const terser = require('terser');
 
 const targetDir = join(__dirname, '..', 'src', 'encryption');
 
-var obfuscationOptions = {};
-
-var script1 = terser.minify(fs.readFileSync(join(targetDir, 'bootstrap', 'find-entrypoint.js'), 'utf8'), obfuscationOptions);
-var script2 = terser.minify(fs.readFileSync(join(targetDir, 'bootstrap', 'require.js'), 'utf8'), obfuscationOptions);
+const obfuscationOptions = {};
 
 function wrap (code) {
   return `(${code});`
@@ -31,7 +28,12 @@ function buf2pchar(buf, varname) {
   return `const char ${varname}[]={${Array.prototype.join.call(buf, ',')}};`;
 }
 
-const scriptFind = buf2pchar(str2buf(wrap(script1.code)), 'scriptFind');
-const scriptRequire = buf2pchar(str2buf(wrap(script2.code)), 'scriptRequire');
+(async () => {
+  const script1 = await terser.minify(await fs.readFile(join(targetDir, 'bootstrap', 'find-entrypoint.js'), 'utf8'), obfuscationOptions);
+  const script2 = await terser.minify(await fs.readFile(join(targetDir, 'bootstrap', 'require.js'), 'utf8'), obfuscationOptions);
 
-fs.writeFileSync(join(targetDir, 'bootstrap.h'), scriptFind + '\n' + scriptRequire + '\n', 'utf8');
+  const scriptFind = buf2pchar(str2buf(wrap(script1.code)), 'scriptFind');
+  const scriptRequire = buf2pchar(str2buf(wrap(script2.code)), 'scriptRequire');
+  
+  await fs.writeFile(join(targetDir, 'bootstrap.h'), scriptFind + '\n' + scriptRequire + '\n', 'utf8');
+})();
