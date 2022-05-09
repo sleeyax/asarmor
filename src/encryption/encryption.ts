@@ -1,7 +1,8 @@
 import crypto from 'crypto'
-import {join, extname} from 'path';
+import { join, extname } from 'path';
 import { createPackageWithOptions } from 'asar';
-import { generateRandomKey, writeKey } from './helpers';
+import { fromHex } from './helpers';
+import { readFile } from 'fs/promises';
 
 export type EncryptionOptions = {
 	/**
@@ -19,16 +20,21 @@ export type EncryptionOptions = {
 	dst: string;
 
 	/**
-	 * Path to the file where the encryption key will be saved.
+	 * File path to a hex-encoded encryption key.
 	 */
 	keyFilePath?: string;
+
+  /**
+   * Encryption key in plaintext.
+   */
+  key?: string;
 }
 
 /**
  * Encrypts and packages all files into an asar archive.
  */
- export async function encrypt({keyFilePath = join(__dirname, 'src/key.txt'), src, dst }: EncryptionOptions) {
-   const key = await writeKey(generateRandomKey(), keyFilePath);
+ export async function encrypt({keyFilePath = join(__dirname, 'src/key.txt'), key: keyPlaintext, src, dst }: EncryptionOptions) {
+   const key = keyPlaintext ? Buffer.from(keyPlaintext) : Buffer.from(fromHex(await readFile(keyFilePath)));
 
   return createPackageWithOptions(
     src,
