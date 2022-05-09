@@ -13,7 +13,7 @@
     "gyp:build:debug": "node ./node_modules/node-gyp/bin/node-gyp.js build --debug",
     "gyp": "npm run gyp:config && npm run gyp:build",
     "keygen": "node ./scripts/keygen.js",
-    "build": "npm run prepare && npm run gyp && tsc",
+    "build": "tsc && npm run prepare && npm run gyp",
     "build:watch": "tsc --watch",
     "prepack": "npm run clean && npm run build"
   },
