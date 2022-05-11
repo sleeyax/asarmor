@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import crypto from 'crypto';
 
 /**
@@ -24,5 +25,10 @@ export function generateRandomKey() {
 
 export async function writeKey(key: string | Buffer, filePath: string) {
   await fs.writeFile(filePath, toHex(key));
+  return Buffer.from(key);
+}
+
+export function writeKeySync(key: string | Buffer, filePath: string) {
+  fsSync.writeFileSync(filePath, toHex(key));
   return Buffer.from(key);
 }
