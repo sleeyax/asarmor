@@ -6,8 +6,12 @@ const fs = require('fs');
 const {join} = require('path');
 const {writeKeySync, generateRandomKey} = require('../build/src/encryption/helpers');
 
-const keyFile = join(__dirname, '..', 'build', 'src', 'encryption', 'key.txt');
+const keyFileBuild = join(__dirname, '..', 'build', 'src', 'encryption', 'key.txt');
+const keyFileSrc = join(__dirname, '..', 'src', 'encryption', 'key.txt');
 
-if (!fs.existsSync(keyFile)) {
-  writeKeySync(generateRandomKey(), keyFile);
+if (!fs.existsSync(keyFileBuild) || !fs.existsSync(keyFileSrc)) {
+  const key = generateRandomKey();
+  // write the same copy to both src and build directories
+  writeKeySync(key, keyFileBuild);
+  writeKeySync(key, keyFileSrc);
 }
