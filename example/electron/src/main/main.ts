@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { hookNodeModulesAsar } from '../../../../build/src/encryption/hooks';
 
 export default class AppUpdater {
   constructor() {
@@ -22,6 +23,8 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
+
+hookNodeModulesAsar();
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -75,9 +78,12 @@ const createWindow = async () => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      preload: app.isPackaged
+      // TODO: fix preload script (either exclude from encryption or figure out how to decrypt the render process in preload.ts instead via https://www.electronjs.org/docs/latest/api/web-contents/#webcontentsgetfocusedwebcontents)
+      /* preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
-        : path.join(__dirname, '../../.erb/dll/preload.js'),
+        : path.join(__dirname, '../../.erb/dll/preload.js'), */
+      nodeIntegration: true,
+      contextIsolation: false,
     },
   });
 
@@ -107,6 +113,12 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
+  // Load encrypted renderer process
+  await mainWindow.webContents.executeJavaScript(`!function () {
+    require('../renderer/renderer.node');
+    require('../renderer/renderer.js');
+  }()`);
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -124,14 +136,24 @@ app.on('window-all-closed', () => {
   }
 });
 
-app
-  .whenReady()
-  .then(() => {
-    createWindow();
-    app.on('activate', () => {
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
-    });
-  })
-  .catch(console.log);
+module.exports = function bootstrap(k: Uint8Array) {
+  if (!Array.isArray(k) || k.length === 0) {
+    throw new Error('Failed to bootstrap application.');
+  }
+
+  if (!process.env.ELECTRON_RUN_AS_NODE) {
+    app
+      .whenReady()
+      .then(() => {
+        createWindow();
+        app.on('activate', () => {
+          // On macOS it's common to re-create a window in the app when the
+          // dock icon is clicked and there are no other windows open.
+          if (mainWindow === null) createWindow();
+        });
+      })
+      .catch(console.log);
+  } else {
+    console.error('failed to bootstrap main process');
+  }
+};
