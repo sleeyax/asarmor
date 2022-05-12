@@ -30,6 +30,8 @@ export type EncryptionOptions = {
   key?: string;
 }
 
+// TODO: encrypt files from existing asar archive.
+
 /**
  * Encrypts and packages all files into an asar archive.
  */
