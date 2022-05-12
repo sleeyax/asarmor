@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import {open, createBloatPatch, createTrashPatch} from '../src';
+import {open, createBloatPatch, createTrashPatch, encrypt} from '../src';
 const { version } = require('../package.json');
 
 const program = new Command();
@@ -13,6 +13,8 @@ program
 	.option('-r, --restore', 'restore backup')
 	.option('-bl, --bloat [gigabytes]', 'add huge random files to disk on extraction attempt')
 	.option('-t, --trashify [junkfiles...]', 'add fake files to the archive')
+	.option('-e, --encrypt <src>', 'encrypt file contents')
+	.option('-k, --key <file path>', 'key file to use for encryption')
 	.on('--help', () => {
 		console.log('');
 		console.log('Examples:');
@@ -29,6 +31,19 @@ if (!program.archive || !program.output) {
 }
 
 async function main() {
+	if (program.encrypt) {
+		if (!program.key) {
+			program.help();
+			program.exit();
+		}
+
+		await encrypt({
+			src: program.encrypt,
+			dst: program.archive,
+			keyFilePath: program.key
+		});
+	}
+
 	const asarmor = await open(program.archive);
 	
 	if (program.restore) {
