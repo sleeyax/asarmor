@@ -7,7 +7,7 @@
     "test": "jest",
     "start": "node ./build/bin/asarmor.js",
     "clean": "rimraf build",
-    "prepare": "npm run build && node ./scripts/keygen.js && node ./scripts/js2c.js && npm run gyp",
+    "prepare": "husyky install && npm run build && node ./scripts/keygen.js && node ./scripts/js2c.js && npm run gyp",
     "gyp:config": "node ./node_modules/node-gyp/bin/node-gyp.js configure --target=16.0.2 --disturl=https://electronjs.org/headers",
     "gyp:build": "node ./node_modules/node-gyp/bin/node-gyp.js build",
     "gyp:build:debug": "node ./node_modules/node-gyp/bin/node-gyp.js build --debug",
@@ -54,12 +54,17 @@
     "babel-jest": "^27.3.1",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
+    "husky": "^8.0.1",
     "jest": "^27.3.1",
+    "lint-staged": "^12.4.1",
     "node-addon-api": "^5.0.0",
     "node-gyp": "^9.0.0",
     "prettier": "2.6.2",
     "rimraf": "^3.0.2",
     "terser": "^5.13.1",
     "typescript": "^4.0.2"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown src/**/*.ts bin/*.ts"
   }
 }
