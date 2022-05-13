@@ -6,8 +6,10 @@ import crypto from 'crypto';
  * Convert an encryption key to a comma separeted hex string.
  * @param key encryption key in plaintext
  */
- export function toHex(key: string | Buffer) {
-  const hex = Array.prototype.map.call(Buffer.from(key), (v => ('0x' + ('0' + v.toString(16)).slice(-2)))).toString();
+export function toHex(key: string | Buffer) {
+  const hex = Array.prototype.map
+    .call(Buffer.from(key), (v) => '0x' + ('0' + v.toString(16)).slice(-2))
+    .toString();
   return Buffer.from(hex);
 }
 
@@ -16,7 +18,13 @@ import crypto from 'crypto';
  * @param key comma separated hex string
  */
 export function fromHex(key: string | Buffer) {
-  return Buffer.from(key.toString().trim().split(',').map(v => Number(v.trim())));
+  return Buffer.from(
+    key
+      .toString()
+      .trim()
+      .split(',')
+      .map((v) => Number(v.trim()))
+  );
 }
 
 export function generateRandomKey() {

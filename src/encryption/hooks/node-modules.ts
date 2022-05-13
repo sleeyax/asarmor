@@ -8,7 +8,7 @@ import Module from 'module';
 // @ts-ignore
 const originalResolveLookupPaths = Module._resolveLookupPaths;
 
-function ovverride2 (request: unknown, parent: unknown) {
+function ovverride2(request: unknown, parent: unknown) {
   // @ts-ignore
   const result = originalResolveLookupPaths.call(this, request, parent);
 
@@ -24,7 +24,7 @@ function ovverride2 (request: unknown, parent: unknown) {
   return result;
 }
 
-function ovverride1 (request: unknown, parent: unknown, newReturn: unknown) {
+function ovverride1(request: unknown, parent: unknown, newReturn: unknown) {
   const result = originalResolveLookupPaths.call(
     // @ts-ignore
     this,
@@ -34,7 +34,7 @@ function ovverride1 (request: unknown, parent: unknown, newReturn: unknown) {
   );
 
   const paths = newReturn ? result : result[1];
-  
+
   for (let i = 0; i < paths.length; i++) {
     if (path.basename(paths[i]) === 'node_modules') {
       paths.splice(i + 1, 0, `${paths[i]}.asar`);
@@ -50,5 +50,6 @@ function ovverride1 (request: unknown, parent: unknown, newReturn: unknown) {
  */
 export function hookNodeModulesAsar() {
   // @ts-ignore
-  Module._resolveLookupPaths = originalResolveLookupPaths.length === 2 ? ovverride2 : ovverride1;
+  Module._resolveLookupPaths =
+    originalResolveLookupPaths.length === 2 ? ovverride2 : ovverride1;
 }
