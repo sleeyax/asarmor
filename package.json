@@ -16,7 +16,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "prepack": "npm run clean && npm run build",
-    "prettier": "npm run prettier --write src/**/*.ts"
+    "prettier": "npx prettier --write src/**/*.ts bin/*.ts"
   },
   "jest": {
     "modulePathIgnorePatterns": [
