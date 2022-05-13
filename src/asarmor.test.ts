@@ -5,16 +5,16 @@ test('can patch archive', () => {
   const asarmor = new Asarmor('', {
     header: {
       files: {
-        'foo.txt': {offset: 0, size: 0}
-      }
+        'foo.txt': { offset: 0, size: 0 },
+      },
     },
-    headerSize: 0
+    headerSize: 0,
   });
 
-  let archive = asarmor.patch({
+  const archive = asarmor.patch({
     header: {
       files: {
-        'bar.txt': {offset: 0, size: 0}
+        'bar.txt': { offset: 0, size: 0 },
       },
     },
   });
@@ -27,15 +27,15 @@ test('can patch archive', () => {
 test('can apply bloat patch', () => {
   const asarmor = new Asarmor('', {
     header: {
-      files: {}
+      files: {},
     },
-    headerSize: 0
+    headerSize: 0,
   });
 
   const archive = asarmor.patch(createBloatPatch(10));
   const filenames = Object.keys(archive.header.files);
   const totalSize = filenames
-    .map(filename => (archive.header.files[filename] as File).size)
+    .map((filename) => (archive.header.files[filename] as File).size)
     .reduce((x, y) => x + y, 0);
 
   expect(filenames.length).toBe(10);
@@ -45,25 +45,27 @@ test('can apply bloat patch', () => {
 test('can apply trash patch', () => {
   const asarmor = new Asarmor('', {
     header: {
-      files: {}
+      files: {},
     },
-    headerSize: 0
+    headerSize: 0,
   });
 
-  const filenames = [
-    'foo',
-    'bar',
-    'baz'
-  ];
+  const filenames = ['foo', 'bar', 'baz'];
 
-  const archive = asarmor.patch(createTrashPatch({
-    filenames,
-    beforeWrite: (filename) => filename + '.js'
-  }));
+  const archive = asarmor.patch(
+    createTrashPatch({
+      filenames,
+      beforeWrite: (filename) => filename + '.js',
+    })
+  );
 
   const actualFilenames = Object.keys(archive.header.files);
-  const invalidExtension = actualFilenames.some(filename => !filename.endsWith('.js'));
-  const invalidName = actualFilenames.some(filename => filenames.indexOf(filename.replace('.js', '')) == -1)
+  const invalidExtension = actualFilenames.some(
+    (filename) => !filename.endsWith('.js')
+  );
+  const invalidName = actualFilenames.some(
+    (filename) => filenames.indexOf(filename.replace('.js', '')) == -1
+  );
 
   expect(invalidExtension).toBe(false);
   expect(invalidName).toBe(false);
@@ -72,24 +74,24 @@ test('can apply trash patch', () => {
 test('can patch filenames in directories', () => {
   const asarmor = new Asarmor('', {
     header: {
-      files: {}
+      files: {},
     },
-    headerSize: 0
+    headerSize: 0,
   });
 
   const archive = asarmor.patch({
     header: {
       files: {
-        'bar': {
+        bar: {
           files: {
-            'baz': {
+            baz: {
               offset: 0,
-              size: 0
-            }
-          }
-        }
-      }
-    }
+              size: 0,
+            },
+          },
+        },
+      },
+    },
   });
 
   const barDirectory = archive.header.files['bar'] as Header;
