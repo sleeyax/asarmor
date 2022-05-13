@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { open, createBloatPatch, createTrashPatch, encrypt } from '../src';
-const { version } = require('../package.json');
+import { version } from '../package.json';
 
 const program = new Command();
 
