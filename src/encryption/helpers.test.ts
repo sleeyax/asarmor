@@ -1,4 +1,4 @@
-import {unlink} from 'fs/promises';
+import { unlink } from 'fs/promises';
 import { fromHex, generateRandomKey, toHex, writeKey } from './helpers';
 
 test('can generate encryption key', () => {
@@ -26,8 +26,8 @@ test('can write encryption key to file', async () => {
   const key = 'foo bar baz';
   const keyFile = 'key-test-remove-me.txt';
   const result = await writeKey(key, keyFile);
-  
+
   expect(result.toString()).toBe(key);
-  
+
   await unlink(keyFile);
 });
