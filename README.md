@@ -178,7 +178,7 @@ exports.default = async (context) => {
       )
     );
 
-    // copy renderer.node to out dist/build/release folder; the render process will be bootstrapped from the main process later on.
+    // copy renderer.node to our dist/build/release folder; the render process will be bootstrapped from the main process later on.
     await copyFile(
       join(release, 'renderer.node'),
       join(
@@ -210,6 +210,7 @@ Don't forget to update `package.json` as well:
 
 4. Load any hooks at the start of the [main process](https://github.com/sleeyax/asarmor/blob/master/example/electron/src/main/main.ts) file (optional):
 ```ts
+// main.ts
 import { hookNodeModulesAsar } from 'asarmor/src/encryption/hooks';
 
 // load hooks at the start of the file
@@ -219,10 +220,7 @@ hookNodeModulesAsar(); // enables resolution of non-encrypted dependencies from 
 5. Update your `BrowserWindow.webPreferences` configuration settings:
 ```ts
 const mainWindow = new BrowserWindow({
-    show: false,
-    width: 1024,
-    height: 728,
-    icon: getAssetPath('icon.png'),
+    // ...
     webPreferences: {
       nodeIntegration: true,   // MUST BE ENABLED
       contextIsolation: false, // MUST BE DISABLED
@@ -279,6 +277,7 @@ The same should be true for other frameworks that utilise the asar format (unles
 Found a bug or have a question? [Open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Pull Requests are welcome, but please open an issue first if you're adding major changes!
 
 ## related projects
-Here are some other interesting projects (besides [asar](https://www.npmjs.com/package/asar) of course) I came across and/or might have taken inspiration from while researching the asar format:
+* [asar](https://www.npmjs.com/package/asar)
 * [asarbreak](https://www.npmjs.com/package/asarbreak)
 * [patch-asar](https://www.npmjs.com/package/patch-asar)
+* [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo)
