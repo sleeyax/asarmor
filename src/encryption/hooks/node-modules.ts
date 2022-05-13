@@ -45,6 +45,8 @@ function ovverride1(request: unknown, parent: unknown, newReturn: unknown) {
   return result;
 }
 
+// TODO: finish hooking node_modules.asar (or similar plaintext asar file w/ different name!)
+
 /**
  * Hooks into `Module._resolveLookupPaths` so it can resolve unencrypted files from `node_modules.asar`.
  */
