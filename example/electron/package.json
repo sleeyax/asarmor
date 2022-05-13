@@ -36,6 +36,7 @@
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "afterPack": "./afterPack.js",
+    "beforePack": "./beforePack.js",
     "files": [
       "dist",
       "node_modules",

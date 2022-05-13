@@ -18,5 +18,8 @@
     "./bin/*.ts",
     "./src/**/*.ts",
     "package.json"
+  ],
+  "exclude": [
+    "**/*.test.ts"
   ]
 }
