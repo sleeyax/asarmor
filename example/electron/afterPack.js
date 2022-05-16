@@ -9,7 +9,7 @@ exports.default = async ({ appOutDir, packager }) => {
     // encrypt file contents first
     const src = join(packager.info.projectDir, 'release', 'app');
     const dst = asarPath;
-    console.log(`asarmor encrypting contents of ${src} to ${dst}`);
+    console.log(`  \x1B[34m•\x1B[0m asarmor encrypting contents of ${src} to ${dst}`);
     const root = join(__dirname, '..', '..');
     await encrypt({
       src,
@@ -18,7 +18,7 @@ exports.default = async ({ appOutDir, packager }) => {
     });
 
     // then patch the header
-    console.log(`asarmor applying patches to ${asarPath}`);
+    console.log(`  \x1B[34m•\x1B[0m asarmor applying patches to ${asarPath}`);
     const archive = await asarmor.open(asarPath);
     archive.patch(); // apply default patches
     await archive.write(asarPath);

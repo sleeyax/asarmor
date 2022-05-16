@@ -3,7 +3,7 @@ const { copyFile } = require('fs/promises');
 
 exports.default = async (context) => {
   try {
-    console.log('copying native dependencies');
+    console.log('  \x1B[34m•\x1B[0m copying native dependencies');
 
     const root = join(__dirname, '..', '..');
 
