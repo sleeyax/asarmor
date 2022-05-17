@@ -10,7 +10,7 @@
     "clean": "rimraf build",
     "install": "node ./scripts/keygen.js && node ./scripts/js2c.js && npm run gyp",
     "prepare": "husky install && npm run build",
-    "gyp:config": "node-gyp configure --target=16.0.2 --disturl=https://electronjs.org/headers",
+    "gyp:config": "node ./scripts/configure.js",
     "gyp:build": "node-gyp build",
     "gyp:build:debug": "node-gyp build --debug",
     "gyp": "npm run gyp:config && npm run gyp:build",
