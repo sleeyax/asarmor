@@ -68,7 +68,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "npm run eslint",
+      "npm run lint",
       "npm run prettier"
     ]
   }
