@@ -36,7 +36,7 @@ export type EncryptionOptions = {
  * Encrypts and packages all files into an asar archive.
  */
 export async function encrypt({
-  keyFilePath = join(__dirname, 'src/key.txt'),
+  keyFilePath = join(__dirname, 'key.txt'),
   key: keyPlaintext,
   src,
   dst,
