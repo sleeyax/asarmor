@@ -46,6 +46,7 @@ function ovverride1(request: unknown, parent: unknown, newReturn: unknown) {
 }
 
 // TODO: finish hooking node_modules.asar (or similar plaintext asar file w/ different name!)
+// See: https://github.com/sleeyax/asarmor/issues/41
 
 /**
  * Hooks into `Module._resolveLookupPaths` so it can resolve unencrypted files from `node_modules.asar`.

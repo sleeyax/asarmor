@@ -31,6 +31,7 @@ export type EncryptionOptions = {
 };
 
 // TODO: encrypt files from existing asar archive.
+// See: https://github.com/sleeyax/asarmor/issues/42
 
 /**
  * Encrypts and packages all files into an asar archive.

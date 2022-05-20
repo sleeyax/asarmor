@@ -79,6 +79,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       // TODO: fix preload script (either exclude from encryption or figure out how to decrypt the render process in preload.ts instead via https://www.electronjs.org/docs/latest/api/web-contents/#webcontentsgetfocusedwebcontents)
+      // See: https://github.com/sleeyax/asarmor/issues/42
       /* preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'), */
