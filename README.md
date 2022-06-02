@@ -23,8 +23,8 @@ Options:
   -r, --restore                  restore backup
   -bl, --bloat [gigabytes]       add huge random files to disk on extraction attempt
   -t, --trashify [junkfiles...]  add fake files to the archive
-  -e, --encrypt <src>             encrypt file contents
-  -ek, --encrypt-key <file path>  key file to use for encryption
+  -e, --encrypt <src>            encrypt file contents
+  -ek, --key <file path>         key file to use for encryption
   -h, --help                     display help for command
 
 Examples:
