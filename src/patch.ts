@@ -75,7 +75,11 @@ export function createTrashPatch(options?: {
     let subdirs = filename.split(/[/\\]/);
     if (subdirs.length > 1) {
       subdirs = subdirs.join('_files_').split('_'); // subdirs: ['a', 'foo.txt'] -> ['a', 'files', 'foo.txt']
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const parent = subdirs.shift()!; // subdirs: ['a', 'files', 'foo.txt'] -> ['files', 'foo.txt']
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const obj: any = files[parent] || {};
       createNestedObject(obj, subdirs, { size, offset });
       files[parent] = obj;
