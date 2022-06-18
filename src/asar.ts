@@ -7,7 +7,16 @@ export interface File {
   /**
    * Offset that specifies where the stored file bytes begin in the archive.
    */
-  offset: number;
+  offset: string;
+
+  integrity?: FileIntegrity;
+}
+
+export interface FileIntegrity {
+  algorithm: 'SHA256';
+  hash: string;
+  blockSize: number;
+  blocks: Buffer[];
 }
 
 export interface FileEntries {
