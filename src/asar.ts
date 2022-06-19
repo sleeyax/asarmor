@@ -7,7 +7,7 @@ export interface File {
   /**
    * Offset that specifies where the stored file bytes begin in the archive.
    */
-  offset: number;
+  offset: string;
 }
 
 export interface FileEntries {

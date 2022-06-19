@@ -5,7 +5,7 @@ test('can patch archive', () => {
   const asarmor = new Asarmor('', {
     header: {
       files: {
-        'foo.txt': { offset: 0, size: 0 },
+        'foo.txt': { offset: '0', size: 0 },
       },
     },
     headerSize: 0,
@@ -14,7 +14,7 @@ test('can patch archive', () => {
   const archive = asarmor.patch({
     header: {
       files: {
-        'bar.txt': { offset: 0, size: 0 },
+        'bar.txt': { offset: '0', size: 0 },
       },
     },
   });
@@ -85,7 +85,7 @@ test('can patch filenames in directories', () => {
         bar: {
           files: {
             baz: {
-              offset: 0,
+              offset: '0',
               size: 0,
             },
           },

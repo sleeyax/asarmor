@@ -2,10 +2,12 @@ export function random(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function randomItem(items: any[]) {
   return items[random(0, items.length - 1)];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createNestedObject(base: any, names: string[], value: any) {
   // If a value is given, remove the last name and keep it for later:
   const lastName = arguments.length === 3 ? names.pop() : false;

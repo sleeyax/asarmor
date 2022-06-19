@@ -20,7 +20,7 @@ export function createBloatPatch(gigabytes = 10): Patch {
     while (Object.keys(files).indexOf(filename) > -1)
       filename = randomBytes(30).toString('hex');
 
-    files[filename] = { offset: 0, size: 1 * 1024 * 1024 * 1024 };
+    files[filename] = { offset: '0', size: 1 * 1024 * 1024 * 1024 };
   }
 
   return {
@@ -75,15 +75,19 @@ export function createTrashPatch(options?: {
     let subdirs = filename.split(/[/\\]/);
     if (subdirs.length > 1) {
       subdirs = subdirs.join('_files_').split('_'); // subdirs: ['a', 'foo.txt'] -> ['a', 'files', 'foo.txt']
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const parent = subdirs.shift()!; // subdirs: ['a', 'files', 'foo.txt'] -> ['files', 'foo.txt']
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const obj: any = files[parent] || {};
-      createNestedObject(obj, subdirs, { size, offset });
+      createNestedObject(obj, subdirs, { size, offset: offset.toString() });
       files[parent] = obj;
     }
     // regular file
     // e.g. foo.txt
     else {
-      files[fileName] = { size, offset };
+      files[fileName] = { size, offset: offset.toString() };
     }
   }
 
