@@ -1,4 +1,5 @@
+.*
 example/
-.idea/
-.github/
 key.txt
+*.json
+*.config.js
