@@ -1,6 +1,7 @@
 {
   "variables": {
-    "module_path": "./build"
+    "module_path": "./build",
+    "openssl_fips": "",
   },
   'target_defaults': {
     'defines': [
