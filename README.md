@@ -116,7 +116,9 @@ exports.default = async ({ appOutDir, packager }) => {
 };
 ```
 
-#### encryption
+<details>
+  <summary>Encryption support (click to expand)</summary>
+  
 Asarmor now finally supports file content encryption. No Electron recompilation required! Huge thanks to toyobayashi's wonderful [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) for making this possible. I won't be going into too many details on how this works exactly. If you're interested in the details I higly recommend you to check out the `electron-asar-encrypt-demo` repository. 
 
 There's a few more steps involved to make this work, though. See [example/electron](https://github.com/sleeyax/asarmor/tree/master/example/electron) if you'd like to skip ahead to the code.
@@ -263,6 +265,7 @@ module.exports = function bootstrap(k: Uint8Array) {
   }
 };
 ```
+</details>
 
 ### examples
 See [examples](example) for detailed code examples.
