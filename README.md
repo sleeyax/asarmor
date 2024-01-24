@@ -276,6 +276,13 @@ See [examples](example) for detailed code examples.
 It depends. If you have a huge archive and applied encryption, then yes. Otherwise, electron should still be able read your asar file at the same speed as if nothing changed. 
 The same should be true for other frameworks that utilise the asar format (unless the implementation differs drastically for some reason, which is out of my control).
 
+## sponsors
+
+[![capsolver](https://i.ibb.co/HKMpT3r/image.png)](https://www.capsolver.com/)
+
+Maintenance of this project is made possible by all the lovely contributors and sponsors.
+If you'd like to sponsor this project and have your avatar or company logo appear in this section, click [here](https://github.com/sponsors/sleeyax). 💖
+
 ## support
 Found a bug or have a question? [Open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Pull Requests are welcome, but please open an issue first if you're adding major changes!
 
