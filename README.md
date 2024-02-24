@@ -278,10 +278,6 @@ The same should be true for other frameworks that utilise the asar format (unles
 
 ## sponsors
 
-[![capsolver](https://s13.gifyu.com/images/S0Ovf.gif)](https://capsolver.com?utm_source=github&utm_medium=banner_github&utm_campaign=asarmor)
-
-[Capsolver.com](https://capsolver.com?utm_source=github&utm_medium=banner_github&utm_campaign=asarmor) is an AI-powered service that provides automatic captcha solving capabilities. It supports a range of captcha types, including reCAPTCHA, hCaptcha, and FunCaptcha, AWS Captcha, Geetest, Akamai Web, BMP, Imperva / Incapsula, image captcha among others.
-
 ---
 
 > Maintenance of this project is made possible by all the lovely contributors and sponsors.
