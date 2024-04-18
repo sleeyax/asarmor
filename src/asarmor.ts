@@ -96,9 +96,6 @@ export default class Asarmor {
   private readonly filePath: string;
   private archive: Archive;
 
-  /**
-   * @deprecated: use the top-level asarmor.open() function to construct a new instance instead.
-   */
   constructor(archivePath: string, archive: Archive) {
     this.filePath = archivePath;
     this.archive = archive;
