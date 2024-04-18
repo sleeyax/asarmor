@@ -1,4 +1,4 @@
-import { createBloatPatch, createTrashPatch, File, Header } from '.';
+import { createBloatPatch, File, Header } from '.';
 import Asarmor from './asarmor';
 
 test('can patch archive', () => {
@@ -40,35 +40,6 @@ test('can apply bloat patch', () => {
 
   expect(filenames.length).toBe(10);
   expect(totalSize).toBe(10737418240);
-});
-
-test('can apply trash patch', () => {
-  const asarmor = new Asarmor('', {
-    header: {
-      files: {},
-    },
-    headerSize: 0,
-  });
-
-  const filenames = ['foo', 'bar', 'baz'];
-
-  const archive = asarmor.patch(
-    createTrashPatch({
-      filenames,
-      beforeWrite: (filename) => filename + '.js',
-    })
-  );
-
-  const actualFilenames = Object.keys(archive.header.files);
-  const invalidExtension = actualFilenames.some(
-    (filename) => !filename.endsWith('.js')
-  );
-  const invalidName = actualFilenames.some(
-    (filename) => filenames.indexOf(filename.replace('.js', '')) == -1
-  );
-
-  expect(invalidExtension).toBe(false);
-  expect(invalidName).toBe(false);
 });
 
 test('can patch filenames in directories', () => {

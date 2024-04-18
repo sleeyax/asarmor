@@ -1,7 +1,7 @@
 import fsAsync, { FileHandle } from 'fs/promises';
 import fs from 'fs';
 import { Archive } from './asar';
-import { createBloatPatch, createTrashPatch } from '.';
+import { createBloatPatch } from '.';
 import { Patch } from './patch';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -109,7 +109,6 @@ export default class Asarmor {
    */
   patch(patch?: Patch): Archive {
     if (!patch) {
-      this.patch(createTrashPatch());
       this.patch(createBloatPatch());
       return this.archive;
     }

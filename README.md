@@ -53,17 +53,6 @@ const { encrypt } = require('asarmor/encryption');
   // Create a backup, which can be restored at any point in time through CLI or code.
   await archive.createBackup({backupPath: '~/Documents/backups/app.asar.backup'});
 
-  // Apply customized trash patch.
-  // The trash patch by itself will make sure `asar extract` fails.
-  archive.patch(asarmor.createTrashPatch({
-    filenames: ['foo', 'bar'],
-    beforeWrite: (filename) => {
-      const extensions = ['js', 'ts', 'tsx', 'txt'];
-      const extension = extensions[Math.floor(Math.random() * extensions.length)];
-      return filename + '.' + extension;
-    }
-  }));
-
   // Apply customized bloat patch.
   // The bloat patch by itself will write randomness to disk on extraction attempt.
   archive.patch(asarmor.createBloatPatch(50)); // adds 50 GB of bloat in total

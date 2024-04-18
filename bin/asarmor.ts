@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { open, createBloatPatch, createTrashPatch, encrypt } from '../src';
+import { open, createBloatPatch, encrypt } from '../src';
 import { version } from '../package.json';
 
 const program = new Command();
@@ -15,7 +15,6 @@ program
     '-bl, --bloat [gigabytes]',
     'add huge random files to disk on extraction attempt'
   )
-  .option('-t, --trashify [junkfiles...]', 'add fake files to the archive')
   .option('-e, --encrypt <src>', 'encrypt file contents')
   .option('-k, --key <file path>', 'key file to use for encryption')
   .on('--help', () => {
@@ -56,12 +55,6 @@ async function main() {
   } else if (program.output) {
     if (program.backup) await asarmor.createBackup();
 
-    if (program.trashify)
-      asarmor.patch(
-        createTrashPatch({
-          filenames: program.trashify === true ? undefined : program.trashify,
-        })
-      );
     if (program.bloat)
       asarmor.patch(
         createBloatPatch(program.bloat === true ? undefined : program.bloat)
