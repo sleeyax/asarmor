@@ -13,7 +13,7 @@ program
   .option('-r, --restore', 'restore backup')
   .option(
     '-bl, --bloat [gigabytes]',
-    'add huge random files to disk on extraction attempt'
+    'fill the drive with useless data on extraction attempt'
   )
   .option('-e, --encrypt <src>', 'encrypt file contents')
   .option('-k, --key <file path>', 'key file to use for encryption')

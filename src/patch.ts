@@ -3,14 +3,14 @@ import { Archive, FileEntries } from './asar';
 
 export type Patch = Partial<Archive>;
 
+const CHUNK_SIZE = 1024 * 1024 * 1024;
+
 /**
- * Adds a bunch of random files with large sizes to the archive.
+ * Upon extraction with `asar extract`, this patch will write empty zero-filled (0 bytes) files of the target size in chunks of `1 GB` to disk. Use at your own risk AND responsibility!
  *
- * This patch will result in huge files being written to disk upon extraction with `asar extract`, so use at your own risk AND responsibility!
- *
- * Defaults to `100 GB` of bloat.
+ * Defaults to `100 GB`.
  */
-export function createBloatPatch(gigabytes = 10): Patch {
+export function createBloatPatch(gigabytes = 100): Patch {
   const files: FileEntries = {};
 
   for (let i = 0; i < gigabytes; i++) {
@@ -19,7 +19,9 @@ export function createBloatPatch(gigabytes = 10): Patch {
     while (Object.keys(files).indexOf(filename) > -1)
       filename = randomBytes(30).toString('hex');
 
-    files[filename] = { offset: '0', size: 1 * 1024 * 1024 * 1024 };
+    const offset = Number.MAX_SAFE_INTEGER - CHUNK_SIZE;
+
+    files[filename] = { offset: offset.toString(), size: CHUNK_SIZE };
   }
 
   return {
