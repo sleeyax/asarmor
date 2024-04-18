@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { join, extname } from 'path';
-import { createPackageWithOptions } from 'asar';
+import { createPackageWithOptions } from '@electron/asar';
 import { fromHex } from './helpers';
 import { readFile } from 'fs/promises';
 
