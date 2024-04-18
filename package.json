@@ -7,6 +7,7 @@
     "test": "jest",
     "pretest": "npm run lint",
     "start": "node ./build/bin/asarmor.js",
+    "start:dev": "tsx ./bin/asarmor.ts",
     "clean": "rimraf build",
     "install": "node ./scripts/keygen.js && npm run gyp",
     "prepare": "husky && node ./scripts/js2c.js && npm run build",
@@ -57,6 +58,7 @@
     "rimraf": "^5.0.5",
     "terser": "^5.30.3",
     "ts-jest": "^29.1.2",
+    "tsx": "^4.7.2",
     "typescript": "^5.4.5"
   },
   "lint-staged": {
