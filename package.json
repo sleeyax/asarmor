@@ -1,7 +1,7 @@
 {
   "name": "asarmor",
   "version": "2.1.0-beta.10",
-  "description": "Protect asar archive file from extraction",
+  "description": "Protect asar archive files",
   "main": "build/src/index.js",
   "scripts": {
     "test": "jest",
