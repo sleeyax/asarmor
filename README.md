@@ -1,40 +1,46 @@
 # asarmor
-CLI tool and library that can patch and encrypt your asar file to protect it from extraction (e.g by executing `asar extract`).
-This is not bulletproof, but can be useful as a first level of protection.
+Protects asar files from extraction (with `asar extract`).
+The methods provided by asarmor are not bulletproof, but can be useful as a first level of protection.
 
-## installation
-Install as local library: `$ npm install --save-dev asarmor`
-
-Install as global CLI app: `$ npm install -g asarmor`
-
-## usage
+## Usage
+You can use asarmor as a CLI tool or as a library in your project. The CLI tool is useful for quick and easy protection of your asar files or for trying out asarmor. The library is useful for more advanced use cases, such as integrating asarmor into your Electron project.
 
 ### CLI
-```
-$ asarmor --help
 
+Installation:
+
+`npm install --save-dev asarmor`
+
+Usage:
+
+```
 Usage: asarmor [options]
 
 Options:
-  -V, --version                  output the version number
-  -a, --archive <archive>        input asar file (required)
-  -o, --output <output>          output asar file (required)
-  -b, --backup                   create backup
-  -r, --restore                  restore backup
-  -bl, --bloat [gigabytes]       add huge random files to disk on extraction attempt
-  -t, --trashify [junkfiles...]  add fake files to the archive
-  -e, --encrypt <src>            encrypt file contents
-  -ek, --key <file path>         key file to use for encryption
-  -h, --help                     display help for command
+  -V, --version             output the version number
+  -a, --archive <archive>   input asar file (required)
+  -o, --output <output>     output asar file (required)
+  -b, --backup              create backup
+  -r, --restore             restore backup
+  -bl, --bloat [gigabytes]  fill the drive with useless data on extraction attempt
+  -e, --encrypt <src>       encrypt file contents
+  -k, --key <file path>     key file to use for encryption
+  -h, --help                display help for command
 
 Examples:
   $ asarmor -a app.asar -o asarmor.asar --bloat 1000
-  $ asarmor -a app.asar -o asarmor.asar --trashify bee-movie.txt foo.js bar.ts
-  $ asarmor -a app.asar -o asarmor.asar --trashify --backup
+  $ asarmor -a app.asar -o asarmor.asar --backup
   $ asarmor -a app.asar --restore
 ```
 
-### library
+### Library
+
+Installation:
+
+`npm install -g asarmor`
+
+Usage:
+
 ```javascript
 const asarmor = require('asarmor');
 const { encrypt } = require('asarmor/encryption');
@@ -63,30 +69,7 @@ const { encrypt } = require('asarmor/encryption');
 })();
 ```
 
-#### advanced
-```javascript
-const asarmor = require('asarmor');
-
-(async () => {
-  const archive = await asarmor.open('app.asar');
-
-  // Apply a fully customized patch.
-  // Play around with the different values to see what works best for you.
-  archive.patch({
-    header: {
-      files: {
-        'foo.js': {offset: 0, size: -999},
-        'bar.js': {offset: -123, size: 1337},
-      }
-    },
-  });
-
-  // Write result back to file.
-  await archive.write('protected.asar');
-})();
-```
-
-### electron-builder
+## `electron-builder`
 You can easily include asarmor in your packaging process using an [afterPack](https://www.electron.build/configuration/configuration.html#afterpack) hook:
 ```javascript
 const asarmor = require('asarmor');
@@ -105,12 +88,10 @@ exports.default = async ({ appOutDir, packager }) => {
 };
 ```
 
-<details>
-  <summary>Encryption support (click to expand)</summary>
-  
-Asarmor now finally supports file content encryption. No Electron recompilation required! Huge thanks to toyobayashi's wonderful [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) for making this possible. I won't be going into too many details on how this works exactly. If you're interested in the details I higly recommend you to check out the `electron-asar-encrypt-demo` repository. 
+### Encryption  
+Asarmor can encrypt the contents of your asar file. No Electron recompilation required! Huge thanks to [toyobayashi's](https://github.com/toyobayashi) wonderful [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) for making this possible. I won't be going into too many details on how this works exactly. If you're interested in the details I highly recommend you check out the [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) repository. 
 
-There's a few more steps involved to make this work, though. See [example/electron](https://github.com/sleeyax/asarmor/tree/master/example/electron) if you'd like to skip ahead to the code.
+There's a few more steps involved to make this work. See [example/electron](https://github.com/sleeyax/asarmor/tree/master/example/electron) if you'd like to skip ahead to the code.
 
 Steps:
 
@@ -254,29 +235,29 @@ module.exports = function bootstrap(k: Uint8Array) {
   }
 };
 ```
-</details>
 
-### examples
+## Examples
 See [examples](example) for detailed code examples.
 
 ## FAQ
 **Do protections affect my (electron) app performance?**
 
 It depends. If you have a huge archive and applied encryption, then yes. Otherwise, electron should still be able read your asar file at the same speed as if nothing changed. 
-The same should be true for other frameworks that utilise the asar format (unless the implementation differs drastically for some reason, which is out of my control).
+The same should be true for other frameworks that utilize the asar format (unless the implementation differs drastically for some reason, which is out of my control).
 
-## sponsors
+## Sponsors
 
 ---
 
 > Maintenance of this project is made possible by all the lovely contributors and sponsors.
 If you'd like to sponsor this project and have your avatar or company logo appear in this section, click [here](https://github.com/sponsors/sleeyax). 💖
 
-## support
+## Support
 Found a bug or have a question? [Open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Pull Requests are welcome, but please open an issue first if you're adding major changes!
 
-## related projects
-* [asar](https://www.npmjs.com/package/asar)
+## Credits
+A special thanks to the following projects for making this project possible:
+* [asar](https://github.com/electron/asar)
 * [asarbreak](https://www.npmjs.com/package/asarbreak)
-* [patch-asar](https://www.npmjs.com/package/patch-asar)
+* [patch-asar](https://github.com/L1lith/patch-asar)
 * [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo)
