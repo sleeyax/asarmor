@@ -41,9 +41,10 @@
     "electron asar"
   ],
   "dependencies": {
+    "@commander-js/extra-typings": "^12.0.1",
     "asar": "^3.1.0",
     "chromium-pickle-js": "^0.2.0",
-    "commander": "^6.1.0",
+    "commander": "^12.0.0",
     "node-addon-api": "^5.0.0",
     "node-gyp": "^9.0.0"
   },

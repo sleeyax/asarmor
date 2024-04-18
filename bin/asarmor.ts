@@ -1,66 +1,80 @@
 #!/usr/bin/env node
-import { Command } from 'commander';
+import { Command, InvalidArgumentError } from '@commander-js/extra-typings';
 import { open, createBloatPatch, encrypt } from '../src';
 import { version } from '../package.json';
 
-const program = new Command();
+function parseNumber(value: string, isRequired: boolean) {
+  if (value == null && !isRequired) {
+    return;
+  }
 
-program
+  const parsedValue = parseInt(value, 10);
+
+  if (isNaN(parsedValue)) {
+    throw new InvalidArgumentError('Not a number.');
+  }
+
+  return parsedValue;
+}
+
+const program = new Command()
   .version(version)
-  .option('-a, --archive <archive>', 'input asar file (required)')
-  .option('-o, --output <output>', 'output asar file (required)')
+  .requiredOption('-a, --archive <archive>', 'input asar file (required)')
+  .requiredOption('-o, --output <output>', 'output asar file (required)')
   .option('-b, --backup', 'create backup')
   .option('-r, --restore', 'restore backup')
   .option(
     '-bl, --bloat [gigabytes]',
-    'fill the drive with useless data on extraction attempt'
+    'fill the drive with useless data on extraction attempt',
+    (value) => parseNumber(value, false)
   )
   .option('-e, --encrypt <src>', 'encrypt file contents')
   .option('-k, --key <file path>', 'key file to use for encryption')
-  .on('--help', () => {
-    console.log('');
-    console.log('Examples:');
-    console.log('  $ asarmor -a app.asar -o asarmor.asar --bloat 1000');
-    console.log(
-      '  $ asarmor -a app.asar -o asarmor.asar --trashify bee-movie.txt foo.js bar.ts'
-    );
-    console.log('  $ asarmor -a app.asar -o asarmor.asar --trashify --backup');
-    console.log('  $ asarmor -a app.asar --restore');
-  })
+  .addHelpText(
+    'after',
+    `
+Examples:
+  $ asarmor -a app.asar -o asarmor.asar --bloat 1000
+  $ asarmor -a app.asar -o asarmor.asar --backup
+  $ asarmor -a app.asar --restore
+  `
+  )
   .parse(process.argv);
 
-if (!program.archive || !program.output) {
+const options = program.opts();
+
+if (!options.archive || !options.output) {
   program.help();
-  program.exit();
+  process.exit();
 }
 
 async function main() {
-  if (program.encrypt) {
-    if (!program.key) {
+  if (options.encrypt) {
+    if (!options.key) {
       program.help();
-      program.exit();
+      process.exit();
     }
 
     await encrypt({
-      src: program.encrypt,
-      dst: program.archive,
-      keyFilePath: program.key,
+      src: options.encrypt,
+      dst: options.archive,
+      keyFilePath: options.key,
     });
   }
 
-  const asarmor = await open(program.archive);
+  const asarmor = await open(options.archive);
 
-  if (program.restore) {
+  if (options.restore) {
     await asarmor.restoreBackup();
-  } else if (program.output) {
-    if (program.backup) await asarmor.createBackup();
+  } else if (options.output) {
+    if (options.backup) await asarmor.createBackup();
 
-    if (program.bloat)
+    if (options.bloat)
       asarmor.patch(
-        createBloatPatch(program.bloat === true ? undefined : program.bloat)
+        createBloatPatch(options.bloat === true ? undefined : options.bloat)
       );
 
-    await asarmor.write(program.output);
+    await asarmor.write(options.output);
   }
 }
 
