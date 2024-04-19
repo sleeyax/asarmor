@@ -10,13 +10,18 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 16
-          - 18
+          - 20
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+      # test project
       - run: npm install --ignore-scripts
       - run: npm run prepare
+      - run: npm test
+      # test node example
+      - run: cd example/node
+      - run: npm install
+      - run: npm run build
       - run: npm test
