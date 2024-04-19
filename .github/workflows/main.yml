@@ -22,6 +22,7 @@ jobs:
       - run: npm test
       # test node example
       - working-directory: example/node
+        name: Test Node.js example
         run: |
           npm install
           npm run build
