@@ -26,7 +26,7 @@ export type EncryptionOptions = {
  */
 export async function encrypt({ src, dst }: EncryptionOptions) {
   const keyFile = join(__dirname, 'key.txt');
-  if (!pathExists(keyFile)) {
+  if (!(await pathExists(keyFile))) {
     throw new Error(`Key file '${keyFile}' not found.`);
   }
 
