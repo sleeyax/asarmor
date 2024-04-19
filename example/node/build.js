@@ -1,5 +1,6 @@
 const asar = require('@electron/asar');
 const asarmor = require('../../build/src');
+const {encrypt} = require('../../build/src/encryption');
 const {original, protected} = require('./constants');
 
 (async () => {
@@ -7,7 +8,7 @@ const {original, protected} = require('./constants');
   await asar.createPackageFromFiles('.', original, ['src/index.js', 'src/sum.js', 'package.json']);
   console.log('built archive:', original);
 
-  await asarmor.encrypt({src: original, dst: protected});
+  await encrypt({src: original, dst: protected});
   console.log('encrypted archive:', protected);
 
   // apply asarmor patches
