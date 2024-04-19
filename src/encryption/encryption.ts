@@ -19,27 +19,18 @@ export type EncryptionOptions = {
    * @example `encrypted.asar`.
    */
   dst: string;
-
-  /**
-   *  File path to a hex-encoded encryption key or the encryption key in plaintext.
-   */
-  key?: string;
 };
-
-// TODO: encrypt files from existing asar archive.
-// See: https://github.com/sleeyax/asarmor/issues/42
 
 /**
  * Encrypts and packages all files into an asar archive.
  */
-export async function encrypt({
-  key: keyOrFile = join(__dirname, 'key.txt'),
-  src,
-  dst,
-}: EncryptionOptions) {
-  const key = (await pathExists(keyOrFile))
-    ? Buffer.from(fromHex(await readFile(keyOrFile)))
-    : Buffer.from(keyOrFile.includes(',') ? fromHex(keyOrFile) : keyOrFile);
+export async function encrypt({ src, dst }: EncryptionOptions) {
+  const keyFile = join(__dirname, 'key.txt');
+  if (!pathExists(keyFile)) {
+    throw new Error(`Key file '${keyFile}' not found.`);
+  }
+
+  const key = Buffer.from(fromHex(await readFile(keyFile)));
   const extractedPath = `${src}.extracted`;
 
   extractAll(src, extractedPath);

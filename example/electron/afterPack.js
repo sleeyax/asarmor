@@ -14,7 +14,6 @@ exports.default = async ({ appOutDir, packager }) => {
     await encrypt({
       src: asarPath,
       dst: asarPath,
-      key: join(root, 'build', 'src', 'encryption', 'key.txt'),
     });
 
     // then patch the header

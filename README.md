@@ -45,7 +45,7 @@ Usage:
 const asarmor = require('asarmor');
 
 (async () => {
-  // Encrypt the contents of the asar archive.
+  // Encrypt the JavaScript file contents stored withing the asar file.
   await asarmor.encrypt({
     src: './app.asar', // target asar file to encrypt
     dst: './encrypted.asar', // output asar file
@@ -99,14 +99,12 @@ Steps:
 exports.default = async ({ appOutDir, packager }) => {
   try {
 +   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');   
-+   console.log(`asarmor is encrypting all JS files stored in ${asarPath}`);
++   console.log(`asarmor is encrypting all JavaScript files stored in ${asarPath}`);
 +   await encrypt({
 +     // path to the input asar file
 +     src: asarPath,
 +     // path to the output asar file
 +     dst: asarPath,
-+     // path to the encryption key file; asarmor should generate a new one every time it's installed as a dependency.
-+     key: join(__dirname, '..', 'node_modules', 'asarmor', 'src', 'encryption', 'key.txt'),
 +   });
 -   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');
     console.log(`asarmor applying patches to ${asarPath}`);

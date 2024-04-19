@@ -29,8 +29,8 @@ const program = new Command()
     (value) => parseNumber(value, false)
   )
   .option(
-    '-e, --encryption [key.txt file path or raw string]',
-    'encrypt the archive'
+    '-e, --encryption',
+    'encrypt the JavaScript files stored in the archive'
   )
   .addHelpText(
     'after',
@@ -55,7 +55,6 @@ async function main() {
     await encrypt({
       src: options.archive,
       dst: options.output,
-      key: options.encryption === true ? undefined : options.encryption,
     });
   }
 
