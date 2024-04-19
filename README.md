@@ -169,13 +169,12 @@ Don't forget to update `package.json` as well:
 - "main": "./dist/main/main.js",
 ```
 
-4. Load any hooks at the start of the [main process](https://github.com/sleeyax/asarmor/blob/master/example/electron/src/main/main.ts) file (optional):
+4. **Optional**: load configuration hooks at the start of the [main process](https://github.com/sleeyax/asarmor/blob/master/example/electron/src/main/main.ts) file:
 ```ts
 // main.ts
-import { hookNodeModulesAsar } from 'asarmor/encryption/hooks';
+import { allowUnencrypted } from 'asarmor';
 
-// load hooks at the start of the file
-hookNodeModulesAsar(); // enables resolution of non-encrypted dependencies from node_modules.asar
+allowUnencrypted(['node_modules']); // enables resolution of non-encrypted dependencies from `node_modules.asar`
 ```
 
 5. Update your `BrowserWindow.webPreferences` configuration settings:

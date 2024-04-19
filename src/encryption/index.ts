@@ -1,1 +1,2 @@
-export { encrypt, EncryptionOptions } from './encryption';
+export * from './encryption';
+export * from './allowlist';
