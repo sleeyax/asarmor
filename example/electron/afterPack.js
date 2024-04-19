@@ -10,7 +10,6 @@ exports.default = async ({ appOutDir, packager }) => {
     console.log(
       `  \x1B[34m•\x1B[0m asarmor encrypting contents of ${asarPath}`
     );
-    const root = join(__dirname, '..', '..');
     await encrypt({
       src: asarPath,
       dst: asarPath,
