@@ -21,7 +21,8 @@ jobs:
       - run: npm run prepare
       - run: npm test
       # test node example
-      - run: cd example/node
-      - run: npm install
-      - run: npm run build
-      - run: npm test
+      - working-directory: example/node
+        run: |
+          npm install
+          npm run build
+          npm test
