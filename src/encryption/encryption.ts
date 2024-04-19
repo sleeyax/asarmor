@@ -1,52 +1,41 @@
 import crypto from 'crypto';
 import { join, extname } from 'path';
-import { createPackageWithOptions } from 'asar';
+import { createPackageWithOptions, extractAll } from '@electron/asar';
 import { fromHex } from './helpers';
 import { readFile } from 'fs/promises';
+import { pathExists, remove } from 'fs-extra';
 
 export type EncryptionOptions = {
   /**
-   * Source code to package into an asar archive.
+   * File path to an input asar.
    *
-   * E.g `src`
+   * @example `app.asar`.
    */
   src: string;
 
   /**
-   * Destination file asar file path.
+   * File path to the output asar.
    *
-   * E.g `app.asar`
+   * @example `encrypted.asar`.
    */
   dst: string;
-
-  /**
-   * File path to a hex-encoded encryption key.
-   */
-  keyFilePath?: string;
-
-  /**
-   * Encryption key in plaintext.
-   */
-  key?: string;
 };
-
-// TODO: encrypt files from existing asar archive.
-// See: https://github.com/sleeyax/asarmor/issues/42
 
 /**
  * Encrypts and packages all files into an asar archive.
  */
-export async function encrypt({
-  keyFilePath = join(__dirname, 'key.txt'),
-  key: keyPlaintext,
-  src,
-  dst,
-}: EncryptionOptions) {
-  const key = keyPlaintext
-    ? Buffer.from(keyPlaintext)
-    : Buffer.from(fromHex(await readFile(keyFilePath)));
+export async function encrypt({ src, dst }: EncryptionOptions) {
+  const keyFile = join(__dirname, 'key.txt');
+  if (!(await pathExists(keyFile))) {
+    throw new Error(`Key file '${keyFile}' not found.`);
+  }
 
-  return createPackageWithOptions(src, dst, {
+  const key = Buffer.from(fromHex(await readFile(keyFile)));
+  const extractedPath = `${src}.extracted`;
+
+  extractAll(src, extractedPath);
+
+  await createPackageWithOptions(extractedPath, dst, {
     unpack: '*.node', // C++ modules should not be packed
     transform(filename) {
       if (extname(filename) == '.js') {
@@ -75,4 +64,6 @@ export async function encrypt({
       }
     },
   });
+
+  await remove(extractedPath);
 }

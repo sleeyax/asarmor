@@ -14,7 +14,9 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { hookNodeModulesAsar } from '../../../../build/src/encryption/hooks';
+import { allowUnencrypted } from '../../../../build/src';
+
+allowUnencrypted(['node_modules']);
 
 export default class AppUpdater {
   constructor() {
@@ -23,8 +25,6 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-
-hookNodeModulesAsar();
 
 let mainWindow: BrowserWindow | null = null;
 

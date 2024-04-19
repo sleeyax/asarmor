@@ -1,7 +1,7 @@
 import fsAsync, { FileHandle } from 'fs/promises';
 import fs from 'fs';
 import { Archive } from './asar';
-import { createBloatPatch, createTrashPatch } from '.';
+import { createBloatPatch } from '.';
 import { Patch } from './patch';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -96,9 +96,6 @@ export default class Asarmor {
   private readonly filePath: string;
   private archive: Archive;
 
-  /**
-   * @deprecated: use the top-level asarmor.open() function to construct a new instance instead.
-   */
   constructor(archivePath: string, archive: Archive) {
     this.filePath = archivePath;
     this.archive = archive;
@@ -109,7 +106,6 @@ export default class Asarmor {
    */
   patch(patch?: Patch): Archive {
     if (!patch) {
-      this.patch(createTrashPatch());
       this.patch(createBloatPatch());
       return this.archive;
     }

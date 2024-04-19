@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { join } = require('path');
 const { copyFile } = require('fs/promises');
 

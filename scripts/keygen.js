@@ -1,5 +1,5 @@
 /**
- * Generates a new random AES key to encrypt the asar archive files with if, it doesn't exist yet.
+ * Generates a new random AES key to encrypt the asar archive files with, if it doesn't exist yet.
  */
 
 const fs = require('fs');
