@@ -28,8 +28,10 @@ const program = new Command()
     'fill the drive with useless data on extraction attempt',
     (value) => parseNumber(value, false)
   )
-  .option('-e, --encrypt <src>', 'encrypt file contents')
-  .option('-k, --key <file path>', 'key file to use for encryption')
+  .option(
+    '-e, --encryption [key.txt file path or raw string]',
+    'encrypt the archive'
+  )
   .addHelpText(
     'after',
     `
@@ -49,16 +51,11 @@ if (!options.archive || !options.output) {
 }
 
 async function main() {
-  if (options.encrypt) {
-    if (!options.key) {
-      program.help();
-      process.exit();
-    }
-
+  if (options.encryption) {
     await encrypt({
-      src: options.encrypt,
-      dst: options.archive,
-      keyFilePath: options.key,
+      src: options.archive,
+      dst: options.output,
+      key: options.encryption === true ? undefined : options.encryption,
     });
   }
 

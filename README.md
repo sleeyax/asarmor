@@ -43,21 +43,20 @@ Usage:
 
 ```javascript
 const asarmor = require('asarmor');
-const { encrypt } = require('asarmor/encryption');
 
 (async () => {
   // Encrypt the contents of the asar archive.
-  await encrypt({
-    src: './dist',     // source or transpiled code to encrypt
-    dst: './app.asar', // target asar file
+  await asarmor.encrypt({
+    src: './app.asar', // target asar file to encrypt
+    dst: './encrypted.asar', // output asar file
   });
 
   // Read & parse the (optionally encrypted) asar file.
   // This can take a while depending on the size of your file.
-  const archive = await asarmor.open('app.asar');
+  const archive = await asarmor.open('encrypted.asar');
 
   // Create a backup, which can be restored at any point in time through CLI or code.
-  await archive.createBackup({backupPath: '~/Documents/backups/app.asar.backup'});
+  await archive.createBackup({backupPath: '~/Documents/backups/encrypted.asar.backup'});
 
   // Apply customized bloat patch.
   // The bloat patch by itself will write randomness to disk on extraction attempt.
@@ -99,22 +98,16 @@ Steps:
 ```diff
 exports.default = async ({ appOutDir, packager }) => {
   try {
-+   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');
-+   
-+   // encrypt file contents first
-+   const src = join(packager.info.projectDir, 'release', 'app');
-+   const dst = asarPath;
-+   console.log(`asarmor encrypting contents of ${src} to ${dst}`);
++   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');   
++   console.log(`asarmor encrypting JS contents of ${asarPath} to ${dst}`);
 +   await encrypt({
-+     // path to your source code (e.g. src, build or dist)
-+     src,
-+     // destination asar file to write to
-+     dst,
++     // path to the input asar file
++     src: asarPath,
++     // path to the destination asar file
++     dst: asarPath,
 +     // path to the encryption key file; asarmor should generate a new one every time it's installed as a dev-dependency.
-+     keyFilePath: join(__dirname, '..', 'node_modules', 'asarmor', 'src', 'encryption', 'key.txt'),
++     key: join(__dirname, '..', 'node_modules', 'asarmor', 'src', 'encryption', 'key.txt'),
 +   });
-+
-+   // then patch the header
 -   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');
     console.log(`asarmor applying patches to ${asarPath}`);
     const archive = await asarmor.open(asarPath);
