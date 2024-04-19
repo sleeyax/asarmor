@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       # test project
-      - run: npm install --ignore-scripts
+      - run: npm install
       - run: npm run prepare
       - run: npm test
       # test node example
