@@ -99,13 +99,13 @@ Steps:
 exports.default = async ({ appOutDir, packager }) => {
   try {
 +   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');   
-+   console.log(`asarmor encrypting JS contents of ${asarPath} to ${dst}`);
++   console.log(`asarmor is encrypting all JS files stored in ${asarPath}`);
 +   await encrypt({
 +     // path to the input asar file
 +     src: asarPath,
-+     // path to the destination asar file
++     // path to the output asar file
 +     dst: asarPath,
-+     // path to the encryption key file; asarmor should generate a new one every time it's installed as a dev-dependency.
++     // path to the encryption key file; asarmor should generate a new one every time it's installed as a dependency.
 +     key: join(__dirname, '..', 'node_modules', 'asarmor', 'src', 'encryption', 'key.txt'),
 +   });
 -   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');
@@ -176,7 +176,7 @@ Don't forget to update `package.json` as well:
 4. Load any hooks at the start of the [main process](https://github.com/sleeyax/asarmor/blob/master/example/electron/src/main/main.ts) file (optional):
 ```ts
 // main.ts
-import { hookNodeModulesAsar } from 'asarmor/src/encryption/hooks';
+import { hookNodeModulesAsar } from 'asarmor/encryption/hooks';
 
 // load hooks at the start of the file
 hookNodeModulesAsar(); // enables resolution of non-encrypted dependencies from node_modules.asar
@@ -201,7 +201,7 @@ await mainWindow.webContents.executeJavaScript(`!function () {
 }()`);
 ```
 
-7. Export a default function in the main process, accepting the decryption key as a paramater. 
+7. Export a default function in the main process, accepting the decryption key as a parameter. 
 ```ts
 module.exports = function bootstrap(k: Uint8Array) {
   // sanity check
