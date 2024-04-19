@@ -36,9 +36,8 @@ const program = new Command()
     'after',
     `
 Examples:
-  $ asarmor -a app.asar -o asarmor.asar --bloat 1000
-  $ asarmor -a app.asar -o asarmor.asar --backup
-  $ asarmor -a app.asar --restore
+  $ asarmor -a app.asar -o asarmor.asar --backup --bloat 1000
+  $ asarmor -a plaintext.asar -o encrypted.asar --encryption
   `
   )
   .parse(process.argv);

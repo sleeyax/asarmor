@@ -23,14 +23,12 @@ Options:
   -b, --backup              create backup
   -r, --restore             restore backup
   -bl, --bloat [gigabytes]  fill the drive with useless data on extraction attempt
-  -e, --encrypt <src>       encrypt file contents
-  -k, --key <file path>     key file to use for encryption
+  -e, --encryption          encrypt the JavaScript files stored in the archive
   -h, --help                display help for command
 
 Examples:
-  $ asarmor -a app.asar -o asarmor.asar --bloat 1000
-  $ asarmor -a app.asar -o asarmor.asar --backup
-  $ asarmor -a app.asar --restore
+  $ asarmor -a app.asar -o asarmor.asar --backup --bloat 1000
+  $ asarmor -a plaintext.asar -o encrypted.asar --encryption
 ```
 
 ### Library
