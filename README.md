@@ -98,7 +98,7 @@ exports.default = async ({ appOutDir, packager }) => {
   try {
 +   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');   
 +   console.log(`asarmor is encrypting all JavaScript files stored in ${asarPath}`);
-+   await encrypt({
++   await asarmor.encrypt({
 +     // path to the input asar file
 +     src: asarPath,
 +     // path to the output asar file
