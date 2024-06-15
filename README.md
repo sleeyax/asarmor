@@ -2,22 +2,22 @@
 Protects asar files from extraction (with `asar extract`).
 The [strategies](#strategies) provided by asarmor are not bulletproof, but can be useful as a first level of protection.
 
-## Strategies
-
-### Patches
-Asarmor can apply patches to your asar file to make it harder to extract using default tooling. The patches are applied in a way that doesn't affect the functionality of your application. 
-
-Unfortunately, at the time of writing, most of the 'old school' patches have been patched (pun not intended) by the `asar` project itself. For that reason I strongly recommend enabling [encryption](#encryption) as well.
-
-### Encryption  
-Asarmor can encrypt all JavaScript files in your asar file. No Electron recompilation required! Huge thanks to [toyobayashi's](https://github.com/toyobayashi) wonderful [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) for making this possible. If you're interested in the details I highly recommend you check out the [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) repository. 
-
 ## Sponsors
 
 ---
 
 > Maintenance of this project is made possible by all the lovely contributors and sponsors.
 If you'd like to sponsor this project and have your avatar or company logo appear in this section, click [here](https://github.com/sponsors/sleeyax). 💖
+
+## Strategies
+
+### Patches
+Asarmor can apply patches to your asar file to make it challenging to extract. The patches are applied in a way that doesn't affect the functionality of your application. 
+
+Unfortunately, at the time of writing, most of the 'old school' patches have been patched (pun not intended) by the `asar` project itself. For that reason I strongly recommend enabling [encryption](#encryption) as well.
+
+### Encryption  
+Asarmor can encrypt all JavaScript files in your asar archive. No Electron recompilation required! Huge thanks to [toyobayashi's](https://github.com/toyobayashi) wonderful [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) for making this possible. If you're interested in the details I highly recommend you check out the [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) repository. 
 
 ## Usage
 You can use asarmor as a CLI tool or as a library in your project. The CLI tool is useful for quick and easy protection of your asar files or for trying out asarmor. The library is useful for more advanced use cases, such as integrating asarmor into your Electron project.
@@ -26,7 +26,7 @@ You can use asarmor as a CLI tool or as a library in your project. The CLI tool 
 
 Installation:
 
-`npm install --save-dev asarmor`
+`npm install -g asarmor`
 
 Usage:
 
@@ -52,7 +52,7 @@ Examples:
 
 Installation:
 
-`npm install -g asarmor`
+`npm install --save-dev asarmor`
 
 Usage:
 
@@ -60,7 +60,7 @@ Usage:
 const asarmor = require('asarmor');
 
 (async () => {
-  // Encrypt the JavaScript file contents stored withing the asar file.
+  // Encrypt the JavaScript file contents stored within the asar file.
   await asarmor.encrypt({
     src: './app.asar', // target asar file to encrypt
     dst: './encrypted.asar', // output asar file
@@ -83,7 +83,7 @@ const asarmor = require('asarmor');
 })();
 ```
 
-### `electron-builder`
+### [electron-builder](https://www.electron.build/)
 You can easily include asarmor in your packaging process using an [afterPack](https://www.electron.build/configuration/configuration.html#afterpack) hook:
 ```javascript
 const asarmor = require('asarmor');
@@ -240,7 +240,7 @@ module.exports = function bootstrap(k: Uint8Array) {
 };
 ```
 
-### `electron-forge`
+### [electron-forge](https://www.electronforge.io/)
 The instructions below assume you're using [Vite + TypeScript](https://www.electronforge.io/config/plugins/vite), so please adjust according to your project configuration.
 
 You can easily include asarmor in your packaging process using a [postPackage](https://www.electronforge.io/config/hooks#postpackage) hook:
@@ -251,6 +251,7 @@ import * as asarmor from 'asarmor';
 const config = {
   // ...
   hooks: {
+    // ...
     postPackage: async (forgeConfig, buildPath) => {
       const asarPath = `${buildPath.outputPaths[0]}/resources/app.asar`;
       console.log(
@@ -275,55 +276,63 @@ Steps:
 
 1. Add the following hooks to your `forge.config.ts`:
 ```ts
+import { join } from 'path';
+import { copyFile } from "fs/promises";
+import * as asarmor from "asarmor";
+
 const config = {
-  packageAfterCopy: async (forgeConfig, buildPath) => {
-    try {
-      console.log('copying native asarmor dependencies');
+  // ...
+  hooks: {
+    // ...
+    packageAfterCopy: async (forgeConfig, buildPath) => {
+      try {
+        console.log('copying native asarmor dependencies');
 
-      const release = join(__dirname, 'node_modules', 'asarmor', 'build', 'Release');
-
-      // copy main.node from asarmor to our build folder; this will become the entrypoint later on.
-      await copyFile(
-        join(release, 'main.node'),
-        join(
-          buildPath,
-          '.vite', // change this if you're not using Vite
-          'build',
-          'main.node'
+        const release = join(__dirname, 'node_modules', 'asarmor', 'build', 'Release');
+    
+        // copy main.node from asarmor to our build folder; this will become the entrypoint later on.
+        await copyFile(
+          join(release, 'main.node'),
+          join(
+            buildPath,
+            '.vite', // change this if you're not using Vite
+            'build',
+            'main.node'
+            )
+        );
+    
+        // copy renderer.node to our build folder; the render process will be bootstrapped from the main process later on.
+        await copyFile(
+          join(release, 'renderer.node'),
+          join(
+            buildPath,
+            '.vite', // change this if you're not using Vite
+            'renderer',
+            'main_window',
+            'renderer.node'
           )
-      );
+        );
 
-      // copy renderer.node to our build folder; the render process will be bootstrapped from the main process later on.
-      await copyFile(
-        join(release, 'renderer.node'),
-        join(
-          buildPath,
-          '.vite', // change this if you're not using Vite
-          'renderer',
-          'main_window', // this may be called differently in your project; check your `VitePlugin` configuration
-          'renderer.node'
-        )
+        // uncomment the line below to copy the final build directory for debugging purposes.
+        // await cp(buildPath, './tmp', {recursive: true, force: true});
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    postPackage: async (forgeConfig, buildPath) => {
+      const asarPath = `${buildPath.outputPaths[0]}/resources/app.asar`;
+      console.log(
+        `asarmor is encrypting all JavaScript files stored in ${asarPath}`
       );
-
-      // uncomment the line below to copy the final build directory, for debugging purposes only.
-      // await cp(buildPath, './tmp', {recursive: true, force: true});
-    } catch (err) {
-      console.error(err);
-    }
-  },
-  postPackage: async (forgeConfig, buildPath) => {
-    const asarPath = `${buildPath.outputPaths[0]}/resources/app.asar`;
-    console.log(
-      `asarmor is encrypting all JavaScript files stored in ${asarPath}`
-    );
-    await asarmor.encrypt({
-      src: asarPath,
-      dst: asarPath,
-    });
-    console.log(`asarmor is applying patches to ${asarPath}`);
-    const archive = await asarmor.open(asarPath);
-    archive.patch();
-    await archive.write(asarPath);
+      await asarmor.encrypt({
+        src: asarPath,
+        dst: asarPath,
+      });
+      console.log(`asarmor is applying patches to ${asarPath}`);
+      const archive = await asarmor.open(asarPath);
+      archive.patch();
+      await archive.write(asarPath);
+    },
   },
 };
 ```
@@ -378,7 +387,7 @@ await mainWindow.webContents.executeJavaScript(`!function () {
 }()`);
 ```
 
-If you deviated from the default instructions in step `3`, replace `./assets/index.js` with the path to your renderer entrypoint.
+If you deviated from the default instructions in step `3`, replace `./assets/index.js` with the path to your renderer asset.
 
 6. Export a default function in the main process, accepting the decryption key as a parameter.
 ```ts
