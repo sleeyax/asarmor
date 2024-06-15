@@ -1,6 +1,23 @@
 # asarmor
 Protects asar files from extraction (with `asar extract`).
-The methods provided by asarmor are not bulletproof, but can be useful as a first level of protection.
+The [strategies](#strategies) provided by asarmor are not bulletproof, but can be useful as a first level of protection.
+
+## Sponsors
+
+---
+
+> Maintenance of this project is made possible by all the lovely contributors and sponsors.
+If you'd like to sponsor this project and have your avatar or company logo appear in this section, click [here](https://github.com/sponsors/sleeyax). 💖
+
+## Strategies
+
+### Patches
+Asarmor can apply patches to your asar file to make it challenging to extract. The patches are applied in a way that doesn't affect the functionality of your application. 
+
+Unfortunately, at the time of writing, most of the 'old school' patches have been patched (pun not intended) by the `asar` project itself. For that reason I strongly recommend enabling [encryption](#encryption) as well.
+
+### Encryption  
+Asarmor can encrypt all JavaScript files in your asar archive. No Electron recompilation required! Huge thanks to [toyobayashi's](https://github.com/toyobayashi) wonderful [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) for making this possible. If you're interested in the details I highly recommend you check out the [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) repository. 
 
 ## Usage
 You can use asarmor as a CLI tool or as a library in your project. The CLI tool is useful for quick and easy protection of your asar files or for trying out asarmor. The library is useful for more advanced use cases, such as integrating asarmor into your Electron project.
@@ -9,7 +26,7 @@ You can use asarmor as a CLI tool or as a library in your project. The CLI tool 
 
 Installation:
 
-`npm install --save-dev asarmor`
+`npm install -g asarmor`
 
 Usage:
 
@@ -35,7 +52,7 @@ Examples:
 
 Installation:
 
-`npm install -g asarmor`
+`npm install --save-dev asarmor`
 
 Usage:
 
@@ -43,7 +60,7 @@ Usage:
 const asarmor = require('asarmor');
 
 (async () => {
-  // Encrypt the JavaScript file contents stored withing the asar file.
+  // Encrypt the JavaScript file contents stored within the asar file.
   await asarmor.encrypt({
     src: './app.asar', // target asar file to encrypt
     dst: './encrypted.asar', // output asar file
@@ -66,7 +83,7 @@ const asarmor = require('asarmor');
 })();
 ```
 
-## `electron-builder`
+### [electron-builder](https://www.electron.build/)
 You can easily include asarmor in your packaging process using an [afterPack](https://www.electron.build/configuration/configuration.html#afterpack) hook:
 ```javascript
 const asarmor = require('asarmor');
@@ -75,7 +92,7 @@ const { join } = require("path");
 exports.default = async ({ appOutDir, packager }) => {
   try {
     const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');
-    console.log(`asarmor applying patches to ${asarPath}`);
+    console.log(`asarmor is applying patches to ${asarPath}`);
     const archive = await asarmor.open(asarPath);
     archive.patch(); // apply default patches
     await archive.write(asarPath);
@@ -85,27 +102,26 @@ exports.default = async ({ appOutDir, packager }) => {
 };
 ```
 
-### Encryption  
-Asarmor can encrypt the contents of your asar file. No Electron recompilation required! Huge thanks to [toyobayashi's](https://github.com/toyobayashi) wonderful [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) for making this possible. I won't be going into too many details on how this works exactly. If you're interested in the details I highly recommend you check out the [electron-asar-encrypt-demo](https://github.com/toyobayashi/electron-asar-encrypt-demo) repository. 
-
-There's a few more steps involved to make this work. See [example/electron](https://github.com/sleeyax/asarmor/tree/master/example/electron) if you'd like to skip ahead to the code.
+There's a few more steps involved to get encryption working. See [example/electron-builder](./example/electron-builder) if you'd like to skip ahead to the code.
 
 Steps:
 
-1. Update [afterPack.js](https://github.com/sleeyax/asarmor/blob/master/example/electron/afterPack.js):
-```diff
+1. Update [afterPack.js](./example/electron-builder/afterPack.js):
+```js
 exports.default = async ({ appOutDir, packager }) => {
   try {
-+   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');   
-+   console.log(`asarmor is encrypting all JavaScript files stored in ${asarPath}`);
-+   await asarmor.encrypt({
-+     // path to the input asar file
-+     src: asarPath,
-+     // path to the output asar file
-+     dst: asarPath,
-+   });
--   const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');
-    console.log(`asarmor applying patches to ${asarPath}`);
+    const asarPath = join(packager.getResourcesDir(appOutDir), 'app.asar');
+
+    console.log(
+      `  \x1B[34m•\x1B[0m asarmor encrypting contents of ${asarPath}`
+    );
+    await encrypt({
+      src: asarPath,
+      dst: asarPath,
+    });
+
+    // then patch the header
+    console.log(`  \x1B[34m•\x1B[0m asarmor applying patches to ${asarPath}`);
     const archive = await asarmor.open(asarPath);
     archive.patch(); // apply default patches
     await archive.write(asarPath);
@@ -115,7 +131,7 @@ exports.default = async ({ appOutDir, packager }) => {
 };
 ```
 
-2. Create [beforePack.js](https://github.com/sleeyax/asarmor/blob/master/example/electron/beforePack.js):
+2. Create [beforePack.js](./example/electron-builder/beforePack.js):
 ```js
 const { join } = require('path');
 const { copyFile } = require('fs/promises');
@@ -124,7 +140,7 @@ exports.default = async (context) => {
   try {
     console.log('copying native dependencies');
 
-    const release = join(__dirname, '..', 'node_modules', 'asarmor', 'Release');
+    const release = join(__dirname, '..', 'node_modules', 'asarmor', 'build', 'Release');
 
     // copy main.node from asarmor to our dist/build/release folder; this will become the entrypoint later on.
     await copyFile(
@@ -163,13 +179,13 @@ Don't forget to update `package.json` as well:
 + "beforePack": "./beforePack.js",
 ```
 
-3. Update your project's [package.json](https://github.com/sleeyax/asarmor/blob/master/example/electron/package.json) entrypoint:
+3. Update your project's [package.json](./example/electron-builder/package.json) entrypoint:
 ```diff
 + "main": "./dist/main/main.node",
 - "main": "./dist/main/main.js",
 ```
 
-4. **Optional**: load configuration hooks at the start of the [main process](https://github.com/sleeyax/asarmor/blob/master/example/electron/src/main/main.ts) file:
+4. **Optional**: load configuration hooks at the start of the [main process](./example/electron-builder/src/main/main.ts) file:
 ```ts
 // main.ts
 import { allowUnencrypted } from 'asarmor';
@@ -224,21 +240,189 @@ module.exports = function bootstrap(k: Uint8Array) {
 };
 ```
 
-## Examples
-See [examples](example) for detailed code examples.
+### [electron-forge](https://www.electronforge.io/)
+The instructions below assume you're using the [Vite + TypeScript](https://www.electronforge.io/config/plugins/vite) configuration. You may need to adjust the instructions according to your setup.
 
-## FAQ
-**Do protections affect my (electron) app performance?**
+You can easily include asarmor in your packaging process using a [postPackage](https://www.electronforge.io/config/hooks#postpackage) hook:
 
-It depends. If you have a huge archive and applied encryption, then yes. Otherwise, electron should still be able read your asar file at the same speed as if nothing changed. 
-The same should be true for other frameworks that utilize the asar format (unless the implementation differs drastically for some reason, which is out of my control).
+```ts
+import * as asarmor from 'asarmor';
 
-## Sponsors
+const config = {
+  // ...
+  hooks: {
+    // ...
+    postPackage: async (forgeConfig, buildPath) => {
+      const asarPath = `${buildPath.outputPaths[0]}/resources/app.asar`;
+      console.log(
+        `asarmor is encrypting all JavaScript files stored in ${asarPath}`
+      );
+      await asarmor.encrypt({
+        src: asarPath,
+        dst: asarPath,
+      });
+      console.log(`asarmor is applying patches to ${asarPath}`);
+      const archive = await asarmor.open(asarPath);
+      archive.patch();
+      await archive.write(asarPath);
+    },
+  },
+};
+```
 
----
+There's a few more steps involved to get encryption working. See [example/electron-forge](./example/electron-forge) if you'd like to skip ahead to the code.
 
-> Maintenance of this project is made possible by all the lovely contributors and sponsors.
-If you'd like to sponsor this project and have your avatar or company logo appear in this section, click [here](https://github.com/sponsors/sleeyax). 💖
+Steps:
+
+1. Add the following hooks to your `forge.config.ts`:
+```ts
+import { join } from 'path';
+import { copyFile } from "fs/promises";
+import * as asarmor from "asarmor";
+
+const config = {
+  // ...
+  hooks: {
+    // ...
+    packageAfterCopy: async (forgeConfig, buildPath) => {
+      try {
+        console.log('copying native asarmor dependencies');
+
+        const release = join(__dirname, 'node_modules', 'asarmor', 'build', 'Release');
+    
+        // copy main.node from asarmor to our build folder; this will become the entrypoint later on.
+        await copyFile(
+          join(release, 'main.node'),
+          join(
+            buildPath,
+            '.vite', // change this if you're not using Vite
+            'build',
+            'main.node'
+            )
+        );
+    
+        // copy renderer.node to our build folder; the render process will be bootstrapped from the main process later on.
+        await copyFile(
+          join(release, 'renderer.node'),
+          join(
+            buildPath,
+            '.vite', // change this if you're not using Vite
+            'renderer',
+            'main_window',
+            'renderer.node'
+          )
+        );
+
+        // uncomment the line below to copy the final build directory for debugging purposes.
+        // await cp(buildPath, './tmp', {recursive: true, force: true});
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    postPackage: async (forgeConfig, buildPath) => {
+      const asarPath = `${buildPath.outputPaths[0]}/resources/app.asar`;
+      console.log(
+        `asarmor is encrypting all JavaScript files stored in ${asarPath}`
+      );
+      await asarmor.encrypt({
+        src: asarPath,
+        dst: asarPath,
+      });
+      console.log(`asarmor is applying patches to ${asarPath}`);
+      const archive = await asarmor.open(asarPath);
+      archive.patch();
+      await archive.write(asarPath);
+    },
+  },
+};
+```
+
+2. Update your project's [package.json](./example/electron-forge/package.json) entrypoint:
+```diff
++ "main": ".vite/build/main.node",
+- "main": ".vite/build/main.js",
+```
+
+3. **Optional**: disable chunk splitting of renderer assets. This is recommended to ensure the renderer assets can be bootstrapped correctly from the main process. 
+
+You may choose to skip this step or handle it differently. Whatever you do, make sure you know the import paths as you'll need them in step `5`. See below for more information.
+
+```ts
+// vite.renderer.config.ts
+return {
+  // ...
+  build: {
+    // ...
+    // Add the following rollup configuration:
+    rollupOptions: {
+      output: {
+        // Disable chunk splitting.
+        inlineDynamicImports: true,
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
+      },
+    },
+  },
+};
+```
+
+4. Update your `BrowserWindow.webPreferences` configuration settings:
+```ts
+const mainWindow = new BrowserWindow({
+    // ...
+    webPreferences: {
+      // preload: path.join(__dirname, 'preload.js'), // MUST BE DISABLED (preload scripts are not supported, see #40)
+      nodeIntegration: true,   // MUST BE ENABLED
+      contextIsolation: false, // MUST BE DISABLED
+    },
+  });
+```
+
+5. Bootstrap the render process:
+```ts
+await mainWindow.webContents.executeJavaScript(`!function () {
+  require('./renderer.node');
+  require('./assets/index.js');
+}()`);
+```
+
+If you deviated from the default instructions in step `3`, replace `./assets/index.js` with the path to your renderer asset.
+
+6. Export a default function in the main process, accepting the decryption key as a parameter.
+```ts
+export default function bootstrap(k: Uint8Array) {
+  // sanity check
+  if (!Array.isArray(k) || k.length === 0) {
+    throw new Error('Failed to bootstrap application.');
+  }
+
+  // key should be valid at this point, but you can access it here to perform additional checks.
+  console.log('decryption key: ' + k);
+
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  // Some APIs can only be used after this event occurs.
+  app.on('ready', createWindow);
+
+  // Quit when all windows are closed, except on macOS. There, it's common
+  // for applications and their menu bar to stay active until the user quits
+  // explicitly with Cmd + Q.
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+  });
+
+  app.on('activate', () => {
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+}
+```
 
 ## Support
 Found a bug or have a question? [Open an issue](https://github.com/sleeyax/asarmor/issues) if it doesn't exist yet. Pull Requests are welcome, but please open an issue first if you're adding major changes!
