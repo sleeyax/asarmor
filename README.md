@@ -102,11 +102,11 @@ exports.default = async ({ appOutDir, packager }) => {
 };
 ```
 
-There's a few more steps involved to get encryption working. See [example/electron](https://github.com/sleeyax/asarmor/tree/master/example/electron) if you'd like to skip ahead to the code.
+There's a few more steps involved to get encryption working. See [example/electron-builder](./example/electron-builder) if you'd like to skip ahead to the code.
 
 Steps:
 
-1. Update [afterPack.js](./example/electron/afterPack.js):
+1. Update [afterPack.js](./example/electron-builder/afterPack.js):
 ```js
 exports.default = async ({ appOutDir, packager }) => {
   try {
@@ -131,7 +131,7 @@ exports.default = async ({ appOutDir, packager }) => {
 };
 ```
 
-2. Create [beforePack.js](./example/electron/beforePack.js):
+2. Create [beforePack.js](./example/electron-builder/beforePack.js):
 ```js
 const { join } = require('path');
 const { copyFile } = require('fs/promises');
@@ -179,13 +179,13 @@ Don't forget to update `package.json` as well:
 + "beforePack": "./beforePack.js",
 ```
 
-3. Update your project's [package.json](./example/electron/package.json) entrypoint:
+3. Update your project's [package.json](./example/electron-builder/package.json) entrypoint:
 ```diff
 + "main": "./dist/main/main.node",
 - "main": "./dist/main/main.js",
 ```
 
-4. **Optional**: load configuration hooks at the start of the [main process](./example/electron/src/main/main.ts) file:
+4. **Optional**: load configuration hooks at the start of the [main process](./example/electron-builder/src/main/main.ts) file:
 ```ts
 // main.ts
 import { allowUnencrypted } from 'asarmor';
