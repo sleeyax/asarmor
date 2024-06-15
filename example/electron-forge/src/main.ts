@@ -21,20 +21,17 @@ const createWindow = async () => {
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+    await mainWindow.webContents.executeJavaScript(`!function () {
+      require('./renderer.node');
+      require('./assets/index.js');
+    }()`);
   }
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
-
-  await mainWindow.webContents.executeJavaScript(`!function () {
-    require('./renderer.node');
-    require('./assets/index.js');
-  }()`);
 };
 
-export default function bootstrap(k: Uint8Array) {
+export default function bootstrap(k: Uint8Array | Array<number>) {
   // sanity check
   if (!Array.isArray(k) || k.length === 0) {
     throw new Error('Failed to bootstrap application.');
@@ -64,6 +61,11 @@ export default function bootstrap(k: Uint8Array) {
       createWindow();
     }
   });
+}
+
+// Bootstrap the application with an empty key when running in development mode.
+if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+  bootstrap([0]);
 }
 
 // In this file you can include the rest of your app's specific main process

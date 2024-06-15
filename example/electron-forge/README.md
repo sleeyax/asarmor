@@ -5,14 +5,14 @@
 
 ## Usage
 
-Development:
+### Development
 
-`npm start`
+1. Update `package.json` entrypoint to `"main": ".vite/build/main.js",`
+2. Run `npm start`
 
-Package for production (use this to test whether asarmor is working correctly):
+### Package for production
 
-`npm run package`
-
-To run the packaged application, execute the resulting binary. For example, on Linux:
-
-`./out/my-app-linux-x64/electron-forge-example`
+1. Update `package.json` entrypoint to `"main": ".vite/build/main.node",`
+2. Run `npm run package`
+3. Test the packaged application by executing the resulting binary. 
+For example (on Linux) run `/out/electron-forge-example-linux-x64/electron-forge-example `
