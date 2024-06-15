@@ -241,7 +241,7 @@ module.exports = function bootstrap(k: Uint8Array) {
 ```
 
 ### [electron-forge](https://www.electronforge.io/)
-The instructions below assume you're using [Vite + TypeScript](https://www.electronforge.io/config/plugins/vite), so please adjust according to your project configuration.
+The instructions below assume you're using the [Vite + TypeScript](https://www.electronforge.io/config/plugins/vite) configuration. You may need to adjust the instructions according to your setup.
 
 You can easily include asarmor in your packaging process using a [postPackage](https://www.electronforge.io/config/hooks#postpackage) hook:
 
@@ -345,7 +345,7 @@ const config = {
 
 3. **Optional**: disable chunk splitting of renderer assets. This is recommended to ensure the renderer assets can be bootstrapped correctly from the main process. 
 
-You may choose to skip this step or handle it differently, but whatever you do, please make sure you know the file names so they can be dynamically required from the main process. See step `5` below for more information.
+You may choose to skip this step or handle it differently. Whatever you do, make sure you know the import paths as you'll need them in step `5`. See below for more information.
 
 ```ts
 // vite.renderer.config.ts
@@ -372,7 +372,7 @@ return {
 const mainWindow = new BrowserWindow({
     // ...
     webPreferences: {
-      // preload: path.join(__dirname, 'preload.js'), // DISABLE THIS (preload scripts are not supported, see #40)
+      // preload: path.join(__dirname, 'preload.js'), // MUST BE DISABLED (preload scripts are not supported, see #40)
       nodeIntegration: true,   // MUST BE ENABLED
       contextIsolation: false, // MUST BE DISABLED
     },
