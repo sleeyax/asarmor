@@ -57,7 +57,9 @@ async function main() {
     });
   }
 
-  const asarmor = await open(options.archive);
+  const asarmor = await open(
+    options.encryption ? options.output : options.archive
+  );
 
   if (options.restore) {
     await asarmor.restoreBackup();
